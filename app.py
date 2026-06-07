@@ -490,9 +490,9 @@ elif page == "📈 Portfolio Analysis":
     chart_header("Grade vs Segment Heatmap")
     chart_caption(
         "Each cell shows the number of borrowers at that Grade–Segment intersection. "
-        "Concentrations of HIGH-RISK or SUBPRIME borrowers inside Grade B or C indicate "
-        "potential misclassification — the lender's grade said average, "
-        "the borrower's actual income and employment profile said otherwise.")
+        "689 borrowers rated Grade B landed in SUBPRIME. "
+        "In Grade C, 777 landed in SUBPRIME and 209 in HIGH-RISK. "
+        "The lender's grade said moderate risk — the borrower's LTI ratio said otherwise.")
 
     cross = pd.crosstab(df["loan_grade"], df["segment"])
     cross = cross.reindex(columns=[c for c in ORDER if c in cross.columns])
