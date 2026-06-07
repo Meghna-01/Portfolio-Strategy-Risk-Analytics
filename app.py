@@ -45,7 +45,7 @@ page = st.sidebar.radio("", [
     "📊 Executive Overview",
     "📈 Portfolio Analysis",
     "🎯 Capital Allocation Strategy",
-    "⚡ Stress Testing & Scenarios",
+    "📉 Stress Testing & Scenarios",
     "📋 Management Recommendations"
 ])
 st.sidebar.markdown("---")
@@ -694,11 +694,11 @@ elif page == "🎯 Capital Allocation Strategy":
 
 
 # ============ PAGE 4 ============
-elif page == "⚡ Stress Testing & Scenarios":
+elif page == "📉 Stress Testing & Scenarios":
 
     components.html(SCROLL_TOP, height=0)
 
-    st.title("⚡ Stress Testing & Scenarios")
+    st.title("📉 Stress Testing & Scenarios")
     st.caption("What happens to the portfolio under adverse conditions?")
     st.markdown("---")
 
