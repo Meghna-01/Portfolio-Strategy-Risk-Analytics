@@ -31,6 +31,7 @@ st.markdown("""
 PALETTE = ["#00B4D8", "#FFB703", "#FB8500", "#E63946"]
 BG = "#0E1117"
 ORDER = ["PRIME", "NEAR-PRIME", "SUBPRIME", "HIGH-RISK"]
+CHART_CONFIG = {"scrollZoom": False, "displayModeBar": False}
 
 df = pd.read_csv("clean_lending_data.csv")
 
@@ -90,7 +91,7 @@ def metric_row(labels, values):
         f'<div style="display:flex; gap:14px; margin-bottom:8px;">{cards}</div>',
         unsafe_allow_html=True)
 
-# ── Compute anchor segment table once — used across all pages ──
+# ── Anchor segment table computed once ──
 total_exposure_all = df["loan_amnt"].sum()
 total_loss_all = (df["loan_status"] * df["loan_amnt"]).sum()
 
@@ -217,7 +218,6 @@ if page == "📊 Executive Overview":
         "The riskiest 1% (HIGH-RISK) generate losses far exceeding their portfolio share. "
         "Core strategic opportunity: grow the PRIME book, exit the tail.")
 
-    # ── SCORING TABLE ──
     st.subheader("How the Risk Score Was Built")
     st.caption(
         "Each factor was plotted against default rate across all 32,572 borrowers. "
@@ -283,7 +283,6 @@ if page == "📊 Executive Overview":
     """
     st.markdown(scoring_html, unsafe_allow_html=True)
 
-    # ── SEGMENT DEFINITIONS ──
     st.markdown("---")
     st.subheader("Risk Segments")
     st.caption(
@@ -341,9 +340,8 @@ if page == "📊 Executive Overview":
     rng = np.random.default_rng(42)
     for i, center in enumerate(hist_centers):
         if center < 38 and hist_vals[i] < 60:
-            # gentle upward drift toward the 40 boundary + natural noise
-            base = 25 + (center / 38) * 70          # slopes up as score rises
-            noise = rng.normal(0, 22)               # uneven, organic variation
+            base = 25 + (center / 38) * 70
+            noise = rng.normal(0, 22)
             hist_vals[i] = int(max(8, base + noise))
         elif 38 <= center < 42:
             hist_vals[i] = max(hist_vals[i], int(rng.integers(40, 110)))
@@ -375,7 +373,7 @@ if page == "📊 Executive Overview":
         xaxis=dict(gridcolor="#1f2630", title="Risk Score", range=[0, 100]),
         yaxis=dict(gridcolor="#1f2630", title="Number of Borrowers"),
         margin=dict(t=60, b=10, l=10, r=10), height=420)
-    st.plotly_chart(fig_dist, use_container_width=True)
+    st.plotly_chart(fig_dist, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("---")
 
@@ -392,7 +390,7 @@ if page == "📊 Executive Overview":
             color_discrete_sequence=PALETTE)
         fig1.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
             showlegend=True, margin=dict(t=10, b=10, l=10, r=10), height=400)
-        st.plotly_chart(fig1, use_container_width=True)
+        st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
     with col2:
         chart_header("Default Rate by Risk Tier")
         seg_default = df.groupby("segment")["loan_status"].mean().mul(100).round(1).reset_index()
@@ -409,9 +407,8 @@ if page == "📊 Executive Overview":
         fig2.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
             yaxis=dict(gridcolor="#1f2630", range=[0, seg_default["Default Rate"].max() * 1.25]),
             margin=dict(t=30, b=10, l=10, r=10), height=400)
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
-    # ── ANCHOR TABLE ──
     st.markdown("---")
     st.subheader("Segment Summary — The Foundation of This Analysis")
     render_anchor_table()
@@ -509,7 +506,7 @@ elif page == "📈 Portfolio Analysis":
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
         margin=dict(t=20, b=10, l=10, r=10))
     fig_heat.update_traces(xgap=2, ygap=2)
-    st.plotly_chart(fig_heat, use_container_width=True)
+    st.plotly_chart(fig_heat, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("---")
 
@@ -534,7 +531,7 @@ elif page == "📈 Portfolio Analysis":
             yaxis_title="Exposure ($ Mn)",
             yaxis=dict(gridcolor="#1f2630", range=[0, grade_exposure["Exposure ($ Mn)"].max() * 1.2]),
             margin=dict(t=30, b=10, l=10, r=10), height=420)
-        st.plotly_chart(fig1, use_container_width=True)
+        st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
     with col2:
         chart_header("Default Rate by Loan Grade")
         grade_default = df.groupby("loan_grade")["loan_status"].mean().mul(100).round(1).reset_index()
@@ -558,7 +555,7 @@ elif page == "📈 Portfolio Analysis":
         fig2.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
             yaxis=dict(gridcolor="#1f2630", range=[0, grade_default["Default Rate"].max() * 1.2]),
             margin=dict(t=30, b=10, l=10, r=10), height=420)
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("---")
 
@@ -590,7 +587,7 @@ elif page == "📈 Portfolio Analysis":
             yaxis_title="Net Yield (%)",
             yaxis=dict(gridcolor="#1f2630", range=[min_yield * 1.15, max_yield * 1.5]),
             margin=dict(t=30, b=10, l=10, r=10), height=480)
-        st.plotly_chart(fig3, use_container_width=True)
+        st.plotly_chart(fig3, use_container_width=True, config=CHART_CONFIG)
     with col4:
         chart_header("Interest Rate vs Risk Score")
         chart_caption(
@@ -603,7 +600,7 @@ elif page == "📈 Portfolio Analysis":
         fig4.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
             xaxis=dict(gridcolor="#1f2630"), yaxis=dict(gridcolor="#1f2630"),
             margin=dict(t=10, b=10, l=10, r=10), height=480)
-        st.plotly_chart(fig4, use_container_width=True)
+        st.plotly_chart(fig4, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)
 
@@ -623,7 +620,6 @@ elif page == "🎯 Capital Allocation Strategy":
         "Reallocation from those segments into PRIME reduces portfolio default rate "
         "without shrinking total book size.")
 
-    # ── Reference to anchor table ──
     st.caption(
         "📌 Exposure % and Loss Contribution % below are drawn directly from the "
         "Segment Summary table on Page 1.")
@@ -663,7 +659,7 @@ elif page == "🎯 Capital Allocation Strategy":
             bargap=0.2, bargroupgap=0.05,
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
             margin=dict(t=40, b=40, l=10, r=10), height=480)
-        st.plotly_chart(fig1, use_container_width=True)
+        st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
     with col2:
         chart_header("Recommended Portfolio Reallocation")
         max_alloc = max(max(r["exp_pct"] for r in rows), max(target_alloc[seg] for seg in ORDER))
@@ -685,7 +681,7 @@ elif page == "🎯 Capital Allocation Strategy":
             bargap=0.2, bargroupgap=0.1,
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
             margin=dict(t=40, b=40, l=10, r=80), height=480)
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)
 
@@ -705,12 +701,9 @@ elif page == "🧪 Stress Testing & Scenarios":
         "PRIME is the most resilient — its low base default rate means even a severe shock "
         "causes less absolute damage than the same shock applied to HIGH-RISK.")
 
-    # ── Reference to anchor table ──
     st.caption(
         "📌 Exposure figures and base default rates below come directly from the "
         "Segment Summary table on Page 1. EL = Exposure × Default Rate × LGD.")
-
-    total_exposure = df["loan_amnt"].sum()
 
     base_rows = []
     for r in anchor_rows:
@@ -748,7 +741,6 @@ elif page == "🧪 Stress Testing & Scenarios":
     el_increase      = round(stressed_total_el - base_total_el, 2)
     el_increase_pct  = round((el_increase / base_total_el) * 100, 1) if base_total_el > 0 else 0
 
-    # ── FIX 1: delta_color="inverse" ──
     sc1, sc2, sc3 = st.columns(3)
     sc1.metric("Base Expected Loss", f"${base_total_el} Mn")
     sc2.metric("Stressed Expected Loss", f"${stressed_total_el} Mn",
@@ -758,7 +750,6 @@ elif page == "🧪 Stress Testing & Scenarios":
 
     st.markdown("")
 
-    # ── FIX 5: EL Breakdown Table ──
     st.markdown(
         "<p style='color:#aaaaaa; font-size:13px; margin-bottom:8px;'>"
         "Full computation chain — Exposure × Default Rate × LGD = Expected Loss. "
@@ -800,7 +791,6 @@ elif page == "🧪 Stress Testing & Scenarios":
     )
     st.markdown(el_hdr + el_body + "</tbody></table></div>", unsafe_allow_html=True)
 
-    # ── Stress comparison table ──
     s_header = (
         '<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:15px;">'
         '<thead><tr style="background:#1a1f2e; color:#aaaaaa; font-size:13px;">'
@@ -849,7 +839,7 @@ elif page == "🧪 Stress Testing & Scenarios":
             bargap=0.2, bargroupgap=0.05,
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
             margin=dict(t=40, b=10, l=10, r=10), height=420)
-        st.plotly_chart(fig1, use_container_width=True)
+        st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
     with col2:
         chart_header("Default Rate: Base vs Stressed")
         dr_compare = pd.DataFrame({"Segment": ORDER * 2,
@@ -868,11 +858,10 @@ elif page == "🧪 Stress Testing & Scenarios":
             bargap=0.2, bargroupgap=0.05,
             legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
             margin=dict(t=40, b=10, l=10, r=10), height=420)
-        st.plotly_chart(fig2, use_container_width=True)
+        st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("---")
 
-    # ── "Future" removed from heading ──
     st.subheader("Section 2 — Capital Reallocation Simulator")
     st.caption(
         "Simulates future lending decisions — not movement of existing loans. "
@@ -894,7 +883,6 @@ elif page == "🧪 Stress Testing & Scenarios":
     total_exp    = df["loan_amnt"].sum()
     shift_amount = total_exp * (shift_pct / 100)
 
-    # ── FIX 4: data-driven split ──
     sub_exp_raw  = sub_data["loan_amnt"].sum()
     high_exp_raw = high_data["loan_amnt"].sum()
     risky_total  = sub_exp_raw + high_exp_raw
@@ -911,7 +899,6 @@ elif page == "🧪 Stress Testing & Scenarios":
     sub_pd   = sub_data["loan_status"].mean()
     high_pd  = high_data["loan_status"].mean()
 
-    # ── FIX 2: exposure-weighted base DR ──
     base_port_dr = round(
         (prime_data["loan_amnt"].sum() * prime_pd +
          near_data["loan_amnt"].sum()  * near_pd  +
@@ -937,10 +924,6 @@ elif page == "🧪 Stress Testing & Scenarios":
          sub_exp_new   * sub_pd   * LGD +
          high_exp_new  * high_pd  * LGD) / 1_000_000, 2)
 
-    el_saved       = round(base_port_el - new_port_el, 2)
-    dr_improvement = round(base_port_dr - new_port_dr, 2)
-
-    # ── FIX 3: delta_color="inverse", no manual minus ──
     r1, r2, r3, r4 = st.columns(4)
     r1.metric("Base Portfolio Default Rate", f"{base_port_dr}%")
     r2.metric("Simulated Default Rate", f"{new_port_dr}%",
@@ -953,7 +936,6 @@ elif page == "🧪 Stress Testing & Scenarios":
 
     st.markdown("")
 
-    # ── FIX 4 continued: show split on screen ──
     st.markdown(
         f"<p style='color:#aaaaaa; font-size:13px; margin-top:4px; margin-bottom:16px;'>"
         f"Reallocation sourced proportionally — "
@@ -986,7 +968,7 @@ elif page == "🧪 Stress Testing & Scenarios":
         bargap=0.2, bargroupgap=0.05,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         margin=dict(t=40, b=10, l=10, r=10))
-    st.plotly_chart(fig_sim, use_container_width=True)
+    st.plotly_chart(fig_sim, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)
 
@@ -1047,10 +1029,10 @@ elif page == "📋 Management Recommendations":
     st.markdown("---")
     st.subheader("Analysis Summary")
 
-    high_exp   = seg_stats["HIGH-RISK"]["exp_pct"]
-    high_loss  = seg_stats["HIGH-RISK"]["loss_pct"]
-    high_ratio = round(high_loss / high_exp, 1)
-    prime_dr   = seg_stats["PRIME"]["dr"]
+    high_exp    = seg_stats["HIGH-RISK"]["exp_pct"]
+    high_loss   = seg_stats["HIGH-RISK"]["loss_pct"]
+    high_ratio  = round(high_loss / high_exp, 1)
+    prime_dr    = seg_stats["PRIME"]["dr"]
     prime_yield = seg_stats["PRIME"]["net_yield"]
     sub_exit_pct = round(seg_stats["SUBPRIME"]["exp_pct"] * 0.5 + seg_stats["HIGH-RISK"]["exp_pct"], 1)
 
@@ -1144,6 +1126,6 @@ elif page == "📋 Management Recommendations":
         bargap=0.2, bargroupgap=0.1,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         margin=dict(t=40, b=10, l=80, r=80), height=350)
-    st.plotly_chart(fig_final, use_container_width=True)
+    st.plotly_chart(fig_final, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)
