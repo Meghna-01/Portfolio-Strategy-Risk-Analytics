@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 st.set_page_config(
     page_title="Portfolio Strategy & Risk Analytics",
     layout="wide",
-    initial_sidebar_state="expanded"
+    initial_sidebar_state="auto"
 )
 
 st.markdown("""
@@ -73,11 +73,6 @@ def chart_caption(text):
         f"<p style='text-align:center; color:#aaaaaa; font-size:13px; margin-top:0; margin-bottom:12px;'>{text}</p>",
         unsafe_allow_html=True)
 
-def col_divider():
-    st.markdown(
-        "<div style='border-left:1px solid #2d3447; height:100%; min-height:460px;'></div>",
-        unsafe_allow_html=True)
-
 def metric_row(labels, values):
     cards = ""
     for label, value in zip(labels, values):
@@ -88,7 +83,7 @@ def metric_row(labels, values):
             <p style="color:#00B4D8; font-size:20px; font-weight:bold; margin:0; white-space:nowrap;">{value}</p>
         </div>"""
     st.markdown(
-        f'<div style="display:flex; gap:14px; margin-bottom:8px;">{cards}</div>',
+        f'<div style="display:flex; gap:14px; margin-bottom:8px; flex-wrap:wrap;">{cards}</div>',
         unsafe_allow_html=True)
 
 # ── Anchor segment table computed once ──
@@ -370,44 +365,46 @@ if page == "📊 Executive Overview":
         marker_color="#00B4D8", opacity=0.75, showlegend=False))
     fig_dist.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-        xaxis=dict(gridcolor="#1f2630", title="Risk Score", range=[0, 100]),
-        yaxis=dict(gridcolor="#1f2630", title="Number of Borrowers"),
+        dragmode=False,
+        xaxis=dict(gridcolor="#1f2630", title="Risk Score", range=[0, 100], fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", title="Number of Borrowers", fixedrange=True),
         margin=dict(t=60, b=10, l=10, r=10), height=420)
     st.plotly_chart(fig_dist, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("---")
 
-    col1, divider_col, col2 = st.columns([1, 0.03, 1])
-    with divider_col:
-        col_divider()
-    with col1:
-        chart_header("Portfolio Composition by Risk Tier")
-        seg_counts = df["segment"].value_counts().reset_index()
-        seg_counts.columns = ["Segment", "Count"]
-        seg_counts["Segment"] = pd.Categorical(seg_counts["Segment"], categories=ORDER, ordered=True)
-        seg_counts = seg_counts.sort_values("Segment")
-        fig1 = px.pie(seg_counts, names="Segment", values="Count", hole=0.55,
-            color_discrete_sequence=PALETTE)
-        fig1.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-            showlegend=True, margin=dict(t=10, b=10, l=10, r=10), height=400)
-        st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
-    with col2:
-        chart_header("Default Rate by Risk Tier")
-        seg_default = df.groupby("segment")["loan_status"].mean().mul(100).round(1).reset_index()
-        seg_default.columns = ["Segment", "Default Rate"]
-        seg_default["Segment"] = pd.Categorical(seg_default["Segment"], categories=ORDER, ordered=True)
-        seg_default = seg_default.sort_values("Segment").reset_index(drop=True)
-        fig2 = go.Figure()
-        for i, row in seg_default.iterrows():
-            fig2.add_trace(go.Bar(
-                x=[row["Segment"]], y=[row["Default Rate"]],
-                text=[str(row["Default Rate"]) + "%"],
-                textposition="outside", textfont=dict(size=14, color="white"),
-                marker_color=PALETTE[i], width=0.6, showlegend=False, cliponaxis=False))
-        fig2.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-            yaxis=dict(gridcolor="#1f2630", range=[0, seg_default["Default Rate"].max() * 1.25]),
-            margin=dict(t=30, b=10, l=10, r=10), height=400)
-        st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
+    chart_header("Portfolio Composition by Risk Tier")
+    seg_counts = df["segment"].value_counts().reset_index()
+    seg_counts.columns = ["Segment", "Count"]
+    seg_counts["Segment"] = pd.Categorical(seg_counts["Segment"], categories=ORDER, ordered=True)
+    seg_counts = seg_counts.sort_values("Segment")
+    fig1 = px.pie(seg_counts, names="Segment", values="Count", hole=0.55,
+        color_discrete_sequence=PALETTE)
+    fig1.update_layout(
+        paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
+        dragmode=False,
+        showlegend=True, margin=dict(t=10, b=10, l=10, r=10), height=400)
+    st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
+
+    chart_header("Default Rate by Risk Tier")
+    seg_default = df.groupby("segment")["loan_status"].mean().mul(100).round(1).reset_index()
+    seg_default.columns = ["Segment", "Default Rate"]
+    seg_default["Segment"] = pd.Categorical(seg_default["Segment"], categories=ORDER, ordered=True)
+    seg_default = seg_default.sort_values("Segment").reset_index(drop=True)
+    fig2 = go.Figure()
+    for i, row in seg_default.iterrows():
+        fig2.add_trace(go.Bar(
+            x=[row["Segment"]], y=[row["Default Rate"]],
+            text=[str(row["Default Rate"]) + "%"],
+            textposition="outside", textfont=dict(size=14, color="white"),
+            marker_color=PALETTE[i], width=0.6, showlegend=False, cliponaxis=False))
+    fig2.update_layout(
+        paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
+        dragmode=False,
+        xaxis=dict(fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", range=[0, seg_default["Default Rate"].max() * 1.25], fixedrange=True),
+        margin=dict(t=30, b=10, l=10, r=10), height=400)
+    st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("---")
     st.subheader("Segment Summary — The Foundation of This Analysis")
@@ -489,7 +486,6 @@ elif page == "📈 Portfolio Analysis":
 
     cross = pd.crosstab(df["loan_grade"], df["segment"])
     cross = cross.reindex(columns=[c for c in ORDER if c in cross.columns])
-
     fig_heat = px.imshow(
         cross,
         color_continuous_scale=[
@@ -498,109 +494,115 @@ elif page == "📈 Portfolio Analysis":
             [0.3,  "#0077a8"],
             [1.0,  "#00B4D8"]
         ],
-        text_auto=True,
-        aspect="auto",
+        text_auto=True, aspect="auto",
         labels=dict(x="Risk Segment", y="Loan Grade", color="# Borrowers")
     )
     fig_heat.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
+        dragmode=False,
+        xaxis=dict(fixedrange=True),
+        yaxis=dict(fixedrange=True),
         margin=dict(t=20, b=10, l=10, r=10))
     fig_heat.update_traces(xgap=2, ygap=2)
     st.plotly_chart(fig_heat, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("---")
 
-    col1, divider_col, col2 = st.columns([1, 0.03, 1])
-    with divider_col:
-        col_divider()
-    with col1:
-        chart_header("Exposure by Loan Grade")
-        grade_exposure = df.groupby("loan_grade")["loan_amnt"].sum().div(1_000_000).round(2).reset_index()
-        grade_exposure.columns = ["Grade", "Exposure ($ Mn)"]
-        grade_exposure = grade_exposure.sort_values("Grade", ascending=True).reset_index(drop=True)
-        grade_colors = PALETTE + ["#90E0EF", "#CAF0F8", "#48CAE4"]
-        fig1 = go.Figure()
-        for i, row in grade_exposure.iterrows():
-            fig1.add_trace(go.Bar(
-                x=[row["Grade"]], y=[row["Exposure ($ Mn)"]],
-                text=["$" + str(row["Exposure ($ Mn)"]) + " Mn"],
-                textposition="outside", textfont=dict(size=14, color="white"),
-                marker_color=grade_colors[i % len(grade_colors)],
-                width=0.6, showlegend=False, cliponaxis=False))
-        fig1.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-            yaxis_title="Exposure ($ Mn)",
-            yaxis=dict(gridcolor="#1f2630", range=[0, grade_exposure["Exposure ($ Mn)"].max() * 1.2]),
-            margin=dict(t=30, b=10, l=10, r=10), height=420)
-        st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
-    with col2:
-        chart_header("Default Rate by Loan Grade")
-        grade_default = df.groupby("loan_grade")["loan_status"].mean().mul(100).round(1).reset_index()
-        grade_default.columns = ["Grade", "Default Rate"]
-        grade_default = grade_default.sort_values("Grade").reset_index(drop=True)
-        max_dr = grade_default["Default Rate"].max()
-        min_dr = grade_default["Default Rate"].min()
-        fig2 = go.Figure()
-        for i, row in grade_default.iterrows():
-            ratio = (row["Default Rate"] - min_dr) / (max_dr - min_dr) if max_dr != min_dr else 0.5
-            if ratio < 0.5:
-                r = int(ratio * 2 * 255); g = int(180); b = int(216 - ratio * 2 * 216)
-            else:
-                r = 255; g = int(183 - (ratio - 0.5) * 2 * 183); b = 3
-            fig2.add_trace(go.Bar(
-                x=[row["Grade"]], y=[row["Default Rate"]],
-                text=[str(row["Default Rate"]) + "%"],
-                textposition="outside", textfont=dict(size=14, color="white"),
-                marker_color=f"rgb({r},{g},{b})",
-                width=0.6, showlegend=False, cliponaxis=False))
-        fig2.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-            yaxis=dict(gridcolor="#1f2630", range=[0, grade_default["Default Rate"].max() * 1.2]),
-            margin=dict(t=30, b=10, l=10, r=10), height=420)
-        st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
+    chart_header("Exposure by Loan Grade")
+    grade_exposure = df.groupby("loan_grade")["loan_amnt"].sum().div(1_000_000).round(2).reset_index()
+    grade_exposure.columns = ["Grade", "Exposure ($ Mn)"]
+    grade_exposure = grade_exposure.sort_values("Grade", ascending=True).reset_index(drop=True)
+    grade_colors = PALETTE + ["#90E0EF", "#CAF0F8", "#48CAE4"]
+    fig1 = go.Figure()
+    for i, row in grade_exposure.iterrows():
+        fig1.add_trace(go.Bar(
+            x=[row["Grade"]], y=[row["Exposure ($ Mn)"]],
+            text=["$" + str(row["Exposure ($ Mn)"]) + " Mn"],
+            textposition="outside", textfont=dict(size=14, color="white"),
+            marker_color=grade_colors[i % len(grade_colors)],
+            width=0.6, showlegend=False, cliponaxis=False))
+    fig1.update_layout(
+        paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
+        dragmode=False,
+        yaxis_title="Exposure ($ Mn)",
+        xaxis=dict(fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", range=[0, grade_exposure["Exposure ($ Mn)"].max() * 1.2], fixedrange=True),
+        margin=dict(t=30, b=10, l=10, r=10), height=420)
+    st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
+
+    chart_header("Default Rate by Loan Grade")
+    grade_default = df.groupby("loan_grade")["loan_status"].mean().mul(100).round(1).reset_index()
+    grade_default.columns = ["Grade", "Default Rate"]
+    grade_default = grade_default.sort_values("Grade").reset_index(drop=True)
+    max_dr = grade_default["Default Rate"].max()
+    min_dr = grade_default["Default Rate"].min()
+    fig2 = go.Figure()
+    for i, row in grade_default.iterrows():
+        ratio = (row["Default Rate"] - min_dr) / (max_dr - min_dr) if max_dr != min_dr else 0.5
+        if ratio < 0.5:
+            r = int(ratio * 2 * 255); g = int(180); b = int(216 - ratio * 2 * 216)
+        else:
+            r = 255; g = int(183 - (ratio - 0.5) * 2 * 183); b = 3
+        fig2.add_trace(go.Bar(
+            x=[row["Grade"]], y=[row["Default Rate"]],
+            text=[str(row["Default Rate"]) + "%"],
+            textposition="outside", textfont=dict(size=14, color="white"),
+            marker_color=f"rgb({r},{g},{b})",
+            width=0.6, showlegend=False, cliponaxis=False))
+    fig2.update_layout(
+        paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
+        dragmode=False,
+        xaxis=dict(fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", range=[0, grade_default["Default Rate"].max() * 1.2], fixedrange=True),
+        margin=dict(t=30, b=10, l=10, r=10), height=420)
+    st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("---")
 
-    col3, divider_col2, col4 = st.columns([1, 0.03, 1])
-    with divider_col2:
-        col_divider()
-    with col3:
-        chart_header("Risk-Adjusted Net Yield by Grade")
-        chart_caption(
-            f"Net Yield = Avg Interest Rate − (Default Rate × LGD). "
-            f"Currently using {int(LGD*100)}% LGD — adjust using the sidebar slider. "
-            "Cyan = lender compensated. Red = loss-making on a risk-adjusted basis.")
-        grade_rar = df.groupby("loan_grade").agg(
-            Avg_Rate=("loan_int_rate", "mean"),
-            Default_Rate=("loan_status", "mean")).reset_index()
-        grade_rar["Net_Yield"] = (grade_rar["Avg_Rate"] - (grade_rar["Default_Rate"] * 100 * LGD)).round(2)
-        grade_rar = grade_rar.sort_values("loan_grade").reset_index(drop=True)
-        min_yield = grade_rar["Net_Yield"].min()
-        max_yield = grade_rar["Net_Yield"].max()
-        fig3 = go.Figure()
-        for _, row in grade_rar.iterrows():
-            fig3.add_trace(go.Bar(
-                x=[row["loan_grade"]], y=[row["Net_Yield"]],
-                text=[str(row["Net_Yield"]) + "%"],
-                textposition="outside", textfont=dict(size=14, color="white"),
-                marker_color="#00B4D8" if row["Net_Yield"] >= 0 else "#E63946",
-                width=0.6, showlegend=False, cliponaxis=False))
-        fig3.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-            yaxis_title="Net Yield (%)",
-            yaxis=dict(gridcolor="#1f2630", range=[min_yield * 1.15, max_yield * 1.5]),
-            margin=dict(t=30, b=10, l=10, r=10), height=480)
-        st.plotly_chart(fig3, use_container_width=True, config=CHART_CONFIG)
-    with col4:
-        chart_header("Interest Rate vs Risk Score")
-        chart_caption(
-            "Each dot is a borrower. In a well-priced portfolio, dots trend downward left to right — "
-            "riskier borrowers pay more. Wide scatter = mispricing.")
-        sample = df.sample(2000, random_state=42)
-        fig4 = px.scatter(sample, x="risk_score", y="loan_int_rate", color="segment",
-            color_discrete_sequence=PALETTE, category_orders={"segment": ORDER}, opacity=0.6,
-            labels={"risk_score": "Risk Score", "loan_int_rate": "Interest Rate (%)", "segment": "Segment"})
-        fig4.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-            xaxis=dict(gridcolor="#1f2630"), yaxis=dict(gridcolor="#1f2630"),
-            margin=dict(t=10, b=10, l=10, r=10), height=480)
-        st.plotly_chart(fig4, use_container_width=True, config=CHART_CONFIG)
+    chart_header("Risk-Adjusted Net Yield by Grade")
+    chart_caption(
+        f"Net Yield = Avg Interest Rate − (Default Rate × LGD). "
+        f"Currently using {int(LGD*100)}% LGD — adjust using the sidebar slider. "
+        "Cyan = lender compensated. Red = loss-making on a risk-adjusted basis.")
+    grade_rar = df.groupby("loan_grade").agg(
+        Avg_Rate=("loan_int_rate", "mean"),
+        Default_Rate=("loan_status", "mean")).reset_index()
+    grade_rar["Net_Yield"] = (grade_rar["Avg_Rate"] - (grade_rar["Default_Rate"] * 100 * LGD)).round(2)
+    grade_rar = grade_rar.sort_values("loan_grade").reset_index(drop=True)
+    min_yield = grade_rar["Net_Yield"].min()
+    max_yield = grade_rar["Net_Yield"].max()
+    fig3 = go.Figure()
+    for _, row in grade_rar.iterrows():
+        fig3.add_trace(go.Bar(
+            x=[row["loan_grade"]], y=[row["Net_Yield"]],
+            text=[str(row["Net_Yield"]) + "%"],
+            textposition="outside", textfont=dict(size=14, color="white"),
+            marker_color="#00B4D8" if row["Net_Yield"] >= 0 else "#E63946",
+            width=0.6, showlegend=False, cliponaxis=False))
+    fig3.update_layout(
+        paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
+        dragmode=False,
+        yaxis_title="Net Yield (%)",
+        xaxis=dict(fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", range=[min_yield * 1.15, max_yield * 1.5], fixedrange=True),
+        margin=dict(t=30, b=10, l=10, r=10), height=480)
+    st.plotly_chart(fig3, use_container_width=True, config=CHART_CONFIG)
+
+    chart_header("Interest Rate vs Risk Score")
+    chart_caption(
+        "Each dot is a borrower. In a well-priced portfolio, dots trend downward left to right — "
+        "riskier borrowers pay more. Wide scatter = mispricing.")
+    sample = df.sample(2000, random_state=42)
+    fig4 = px.scatter(sample, x="risk_score", y="loan_int_rate", color="segment",
+        color_discrete_sequence=PALETTE, category_orders={"segment": ORDER}, opacity=0.6,
+        labels={"risk_score": "Risk Score", "loan_int_rate": "Interest Rate (%)", "segment": "Segment"})
+    fig4.update_layout(
+        paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
+        dragmode=False,
+        xaxis=dict(gridcolor="#1f2630", fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", fixedrange=True),
+        margin=dict(t=10, b=10, l=10, r=10), height=480)
+    st.plotly_chart(fig4, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)
 
@@ -637,51 +639,53 @@ elif page == "🎯 Capital Allocation Strategy":
     total_raw = sum(raw_targets.values())
     target_alloc = {seg: round(val / total_raw * 100, 1) for seg, val in raw_targets.items()}
 
-    col1, divider_col, col2 = st.columns([1, 0.03, 1])
-    with divider_col:
-        col_divider()
-    with col1:
-        chart_header("Exposure vs Loss Contribution")
-        exp_loss_data = pd.DataFrame({
-            "Segment": ORDER * 2,
-            "Metric": ["Exposure %"] * 4 + ["Loss Contribution %"] * 4,
-            "Value": ([r["exp_pct"] for r in rows] + [r["loss_pct"] for r in rows])})
-        exp_loss_data["Segment"] = pd.Categorical(exp_loss_data["Segment"], categories=ORDER, ordered=True)
-        fig1 = px.bar(exp_loss_data, x="Segment", y="Value", color="Metric",
-            barmode="group", text="Value",
-            color_discrete_map={"Exposure %": "#00B4D8", "Loss Contribution %": "#E63946"},
-            category_orders={"Segment": ORDER})
-        fig1.update_traces(texttemplate="%{text}%", textposition="outside",
-            textfont=dict(size=14), cliponaxis=False)
-        fig1.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-            yaxis_title="Percentage (%)",
-            yaxis=dict(gridcolor="#1f2630", range=[0, exp_loss_data["Value"].max() * 1.3]),
-            bargap=0.2, bargroupgap=0.05,
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-            margin=dict(t=40, b=40, l=10, r=10), height=480)
-        st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
-    with col2:
-        chart_header("Recommended Portfolio Reallocation")
-        max_alloc = max(max(r["exp_pct"] for r in rows), max(target_alloc[seg] for seg in ORDER))
-        alloc_df = pd.DataFrame({"Segment": ORDER,
-            "Current %": [r["exp_pct"] for r in rows],
-            "Target %": [target_alloc[seg] for seg in ORDER]})
-        alloc_melted = alloc_df.melt(id_vars="Segment",
-            value_vars=["Current %", "Target %"], var_name="Type", value_name="Value")
-        alloc_melted["Segment"] = pd.Categorical(alloc_melted["Segment"], categories=ORDER, ordered=True)
-        fig2 = px.bar(alloc_melted, y="Segment", x="Value", color="Type",
-            barmode="group", text="Value", orientation="h",
-            color_discrete_map={"Current %": "#FFB703", "Target %": "#00B4D8"},
-            category_orders={"Segment": ORDER})
-        fig2.update_traces(texttemplate="%{x}%", textposition="outside",
-            textfont=dict(size=14), cliponaxis=False)
-        fig2.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-            xaxis_title="Allocation (%)",
-            xaxis=dict(gridcolor="#1f2630", range=[0, max_alloc * 1.3]),
-            bargap=0.2, bargroupgap=0.1,
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-            margin=dict(t=40, b=40, l=10, r=80), height=480)
-        st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
+    chart_header("Exposure vs Loss Contribution")
+    exp_loss_data = pd.DataFrame({
+        "Segment": ORDER * 2,
+        "Metric": ["Exposure %"] * 4 + ["Loss Contribution %"] * 4,
+        "Value": ([r["exp_pct"] for r in rows] + [r["loss_pct"] for r in rows])})
+    exp_loss_data["Segment"] = pd.Categorical(exp_loss_data["Segment"], categories=ORDER, ordered=True)
+    fig1 = px.bar(exp_loss_data, x="Segment", y="Value", color="Metric",
+        barmode="group", text="Value",
+        color_discrete_map={"Exposure %": "#00B4D8", "Loss Contribution %": "#E63946"},
+        category_orders={"Segment": ORDER})
+    fig1.update_traces(texttemplate="%{text}%", textposition="outside",
+        textfont=dict(size=14), cliponaxis=False)
+    fig1.update_layout(
+        paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
+        dragmode=False,
+        yaxis_title="Percentage (%)",
+        xaxis=dict(fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", range=[0, exp_loss_data["Value"].max() * 1.3], fixedrange=True),
+        bargap=0.2, bargroupgap=0.05,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        margin=dict(t=40, b=40, l=10, r=10), height=480)
+    st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
+
+    chart_header("Recommended Portfolio Reallocation")
+    max_alloc = max(max(r["exp_pct"] for r in rows), max(target_alloc[seg] for seg in ORDER))
+    alloc_df = pd.DataFrame({"Segment": ORDER,
+        "Current %": [r["exp_pct"] for r in rows],
+        "Target %": [target_alloc[seg] for seg in ORDER]})
+    alloc_melted = alloc_df.melt(id_vars="Segment",
+        value_vars=["Current %", "Target %"], var_name="Type", value_name="Value")
+    alloc_melted["Segment"] = pd.Categorical(alloc_melted["Segment"], categories=ORDER, ordered=True)
+    fig2 = px.bar(alloc_melted, y="Segment", x="Value", color="Type",
+        barmode="group", text="Value", orientation="h",
+        color_discrete_map={"Current %": "#FFB703", "Target %": "#00B4D8"},
+        category_orders={"Segment": ORDER})
+    fig2.update_traces(texttemplate="%{x}%", textposition="outside",
+        textfont=dict(size=14), cliponaxis=False)
+    fig2.update_layout(
+        paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
+        dragmode=False,
+        xaxis_title="Allocation (%)",
+        xaxis=dict(gridcolor="#1f2630", range=[0, max_alloc * 1.3], fixedrange=True),
+        yaxis=dict(fixedrange=True),
+        bargap=0.2, bargroupgap=0.1,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        margin=dict(t=40, b=40, l=10, r=80), height=480)
+    st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)
 
@@ -736,10 +740,10 @@ elif page == "🧪 Stress Testing & Scenarios":
             "stressed_el": stressed_el, "el_change": el_change
         })
 
-    base_total_el    = round(sum(r["base_el"]     for r in stress_rows), 2)
+    base_total_el     = round(sum(r["base_el"]     for r in stress_rows), 2)
     stressed_total_el = round(sum(r["stressed_el"] for r in stress_rows), 2)
-    el_increase      = round(stressed_total_el - base_total_el, 2)
-    el_increase_pct  = round((el_increase / base_total_el) * 100, 1) if base_total_el > 0 else 0
+    el_increase       = round(stressed_total_el - base_total_el, 2)
+    el_increase_pct   = round((el_increase / base_total_el) * 100, 1) if base_total_el > 0 else 0
 
     sc1, sc2, sc3 = st.columns(3)
     sc1.metric("Base Expected Loss", f"${base_total_el} Mn")
@@ -818,47 +822,49 @@ elif page == "🧪 Stress Testing & Scenarios":
     st.markdown(s_header + s_body + "</tbody></table></div>", unsafe_allow_html=True)
     st.markdown("")
 
-    col1, divider_col, col2 = st.columns([1, 0.03, 1])
-    with divider_col:
-        col_divider()
-    with col1:
-        chart_header("Expected Loss: Base vs Stressed")
-        el_compare = pd.DataFrame({"Segment": ORDER * 2,
-            "Scenario": ["Base Case"] * 4 + [scenario] * 4,
-            "Expected Loss ($ Mn)": ([r["base_el"] for r in stress_rows] +
-                                     [r["stressed_el"] for r in stress_rows])})
-        el_compare["Segment"] = pd.Categorical(el_compare["Segment"], categories=ORDER, ordered=True)
-        fig1 = px.bar(el_compare, x="Segment", y="Expected Loss ($ Mn)",
-            color="Scenario", barmode="group", text="Expected Loss ($ Mn)",
-            color_discrete_map={"Base Case": "#00B4D8", scenario: "#E63946"},
-            category_orders={"Segment": ORDER})
-        fig1.update_traces(texttemplate="$%{text} Mn", textposition="outside",
-            textfont=dict(size=13), cliponaxis=False)
-        fig1.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-            yaxis=dict(gridcolor="#1f2630", range=[0, el_compare["Expected Loss ($ Mn)"].max() * 1.3]),
-            bargap=0.2, bargroupgap=0.05,
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-            margin=dict(t=40, b=10, l=10, r=10), height=420)
-        st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
-    with col2:
-        chart_header("Default Rate: Base vs Stressed")
-        dr_compare = pd.DataFrame({"Segment": ORDER * 2,
-            "Scenario": ["Base Case"] * 4 + [scenario] * 4,
-            "Default Rate (%)": ([r["base_dr"] for r in stress_rows] +
-                                 [r["stressed_dr"] for r in stress_rows])})
-        dr_compare["Segment"] = pd.Categorical(dr_compare["Segment"], categories=ORDER, ordered=True)
-        fig2 = px.bar(dr_compare, x="Segment", y="Default Rate (%)",
-            color="Scenario", barmode="group", text="Default Rate (%)",
-            color_discrete_map={"Base Case": "#00B4D8", scenario: "#E63946"},
-            category_orders={"Segment": ORDER})
-        fig2.update_traces(texttemplate="%{text}%", textposition="outside",
-            textfont=dict(size=13), cliponaxis=False)
-        fig2.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-            yaxis=dict(gridcolor="#1f2630", range=[0, dr_compare["Default Rate (%)"].max() * 1.3]),
-            bargap=0.2, bargroupgap=0.05,
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
-            margin=dict(t=40, b=10, l=10, r=10), height=420)
-        st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
+    chart_header("Expected Loss: Base vs Stressed")
+    el_compare = pd.DataFrame({"Segment": ORDER * 2,
+        "Scenario": ["Base Case"] * 4 + [scenario] * 4,
+        "Expected Loss ($ Mn)": ([r["base_el"] for r in stress_rows] +
+                                 [r["stressed_el"] for r in stress_rows])})
+    el_compare["Segment"] = pd.Categorical(el_compare["Segment"], categories=ORDER, ordered=True)
+    fig1 = px.bar(el_compare, x="Segment", y="Expected Loss ($ Mn)",
+        color="Scenario", barmode="group", text="Expected Loss ($ Mn)",
+        color_discrete_map={"Base Case": "#00B4D8", scenario: "#E63946"},
+        category_orders={"Segment": ORDER})
+    fig1.update_traces(texttemplate="$%{text} Mn", textposition="outside",
+        textfont=dict(size=13), cliponaxis=False)
+    fig1.update_layout(
+        paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
+        dragmode=False,
+        xaxis=dict(fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", range=[0, el_compare["Expected Loss ($ Mn)"].max() * 1.3], fixedrange=True),
+        bargap=0.2, bargroupgap=0.05,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        margin=dict(t=40, b=10, l=10, r=10), height=420)
+    st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
+
+    chart_header("Default Rate: Base vs Stressed")
+    dr_compare = pd.DataFrame({"Segment": ORDER * 2,
+        "Scenario": ["Base Case"] * 4 + [scenario] * 4,
+        "Default Rate (%)": ([r["base_dr"] for r in stress_rows] +
+                             [r["stressed_dr"] for r in stress_rows])})
+    dr_compare["Segment"] = pd.Categorical(dr_compare["Segment"], categories=ORDER, ordered=True)
+    fig2 = px.bar(dr_compare, x="Segment", y="Default Rate (%)",
+        color="Scenario", barmode="group", text="Default Rate (%)",
+        color_discrete_map={"Base Case": "#00B4D8", scenario: "#E63946"},
+        category_orders={"Segment": ORDER})
+    fig2.update_traces(texttemplate="%{text}%", textposition="outside",
+        textfont=dict(size=13), cliponaxis=False)
+    fig2.update_layout(
+        paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
+        dragmode=False,
+        xaxis=dict(fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", range=[0, dr_compare["Default Rate (%)"].max() * 1.3], fixedrange=True),
+        bargap=0.2, bargroupgap=0.05,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        margin=dict(t=40, b=10, l=10, r=10), height=420)
+    st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("---")
 
@@ -962,9 +968,12 @@ elif page == "🧪 Stress Testing & Scenarios":
         category_orders={"Segment": ORDER})
     fig_sim.update_traces(texttemplate="$%{text} Mn", textposition="outside",
         textfont=dict(size=13), cliponaxis=False)
-    fig_sim.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
+    fig_sim.update_layout(
+        paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
+        dragmode=False,
         yaxis_title="Exposure ($ Mn)",
-        yaxis=dict(gridcolor="#1f2630", range=[0, realloc_data["Exposure ($ Mn)"].max() * 1.3]),
+        xaxis=dict(fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", range=[0, realloc_data["Exposure ($ Mn)"].max() * 1.3], fixedrange=True),
         bargap=0.2, bargroupgap=0.05,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         margin=dict(t=40, b=10, l=10, r=10))
@@ -1120,9 +1129,12 @@ elif page == "📋 Management Recommendations":
         category_orders={"Segment": ORDER})
     fig_final.update_traces(texttemplate="%{x}%", textposition="outside",
         textfont=dict(size=14), cliponaxis=False)
-    fig_final.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
+    fig_final.update_layout(
+        paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
+        dragmode=False,
         xaxis_title="Allocation (%)",
-        xaxis=dict(gridcolor="#1f2630", range=[0, max_val * 1.3]),
+        xaxis=dict(gridcolor="#1f2630", range=[0, max_val * 1.3], fixedrange=True),
+        yaxis=dict(fixedrange=True),
         bargap=0.2, bargroupgap=0.1,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         margin=dict(t=40, b=10, l=80, r=80), height=350)
