@@ -25,6 +25,10 @@ st.markdown("""
     section[data-testid="stSidebar"] {
         background-color: #0d1117;
     }
+    [data-testid="stSelectbox"] > div > div {
+        border: 1px solid #00B4D8 !important;
+        border-radius: 6px !important;
+        background-color: #1a1f2e !important;
     </style>
 """, unsafe_allow_html=True)
 
