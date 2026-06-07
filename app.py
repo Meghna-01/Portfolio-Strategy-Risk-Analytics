@@ -31,7 +31,7 @@ st.markdown("""
 PALETTE = ["#00B4D8", "#FFB703", "#FB8500", "#E63946"]
 BG = "#0E1117"
 ORDER = ["PRIME", "NEAR-PRIME", "SUBPRIME", "HIGH-RISK"]
-CHART_CONFIG = {"scrollZoom": False, "displayModeBar": False}
+CHART_CONFIG = {"staticPlot": True}
 
 df = pd.read_csv("clean_lending_data.csv")
 
@@ -322,6 +322,7 @@ if page == "📊 Executive Overview":
     """
     st.markdown(seg_def_html, unsafe_allow_html=True)
 
+    st.markdown("---")
     chart_header("Risk Score Distribution — Where Borrowers Cluster")
     chart_caption(
         "Each bar is a group of borrowers at that score. "
@@ -365,14 +366,12 @@ if page == "📊 Executive Overview":
         marker_color="#00B4D8", opacity=0.75, showlegend=False))
     fig_dist.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-        dragmode=False,
-        xaxis=dict(gridcolor="#1f2630", title="Risk Score", range=[0, 100], fixedrange=True),
-        yaxis=dict(gridcolor="#1f2630", title="Number of Borrowers", fixedrange=True),
+        xaxis=dict(gridcolor="#1f2630", title="Risk Score", range=[0, 100]),
+        yaxis=dict(gridcolor="#1f2630", title="Number of Borrowers"),
         margin=dict(t=60, b=10, l=10, r=10), height=420)
     st.plotly_chart(fig_dist, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("---")
-
     chart_header("Portfolio Composition by Risk Tier")
     seg_counts = df["segment"].value_counts().reset_index()
     seg_counts.columns = ["Segment", "Count"]
@@ -382,10 +381,10 @@ if page == "📊 Executive Overview":
         color_discrete_sequence=PALETTE)
     fig1.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-        dragmode=False,
         showlegend=True, margin=dict(t=10, b=10, l=10, r=10), height=400)
     st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
 
+    st.markdown("---")
     chart_header("Default Rate by Risk Tier")
     seg_default = df.groupby("segment")["loan_status"].mean().mul(100).round(1).reset_index()
     seg_default.columns = ["Segment", "Default Rate"]
@@ -400,9 +399,7 @@ if page == "📊 Executive Overview":
             marker_color=PALETTE[i], width=0.6, showlegend=False, cliponaxis=False))
     fig2.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-        dragmode=False,
-        xaxis=dict(fixedrange=True),
-        yaxis=dict(gridcolor="#1f2630", range=[0, seg_default["Default Rate"].max() * 1.25], fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", range=[0, seg_default["Default Rate"].max() * 1.25]),
         margin=dict(t=30, b=10, l=10, r=10), height=400)
     st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
@@ -477,6 +474,7 @@ elif page == "📈 Portfolio Analysis":
     """
     st.markdown(grade_def_html, unsafe_allow_html=True)
 
+    st.markdown("---")
     chart_header("Grade vs Segment Heatmap")
     chart_caption(
         "Each cell shows the number of borrowers at that Grade–Segment intersection. "
@@ -499,15 +497,11 @@ elif page == "📈 Portfolio Analysis":
     )
     fig_heat.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-        dragmode=False,
-        xaxis=dict(fixedrange=True),
-        yaxis=dict(fixedrange=True),
         margin=dict(t=20, b=10, l=10, r=10))
     fig_heat.update_traces(xgap=2, ygap=2)
     st.plotly_chart(fig_heat, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("---")
-
     chart_header("Exposure by Loan Grade")
     grade_exposure = df.groupby("loan_grade")["loan_amnt"].sum().div(1_000_000).round(2).reset_index()
     grade_exposure.columns = ["Grade", "Exposure ($ Mn)"]
@@ -523,13 +517,12 @@ elif page == "📈 Portfolio Analysis":
             width=0.6, showlegend=False, cliponaxis=False))
     fig1.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-        dragmode=False,
         yaxis_title="Exposure ($ Mn)",
-        xaxis=dict(fixedrange=True),
-        yaxis=dict(gridcolor="#1f2630", range=[0, grade_exposure["Exposure ($ Mn)"].max() * 1.2], fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", range=[0, grade_exposure["Exposure ($ Mn)"].max() * 1.2]),
         margin=dict(t=30, b=10, l=10, r=10), height=420)
     st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
 
+    st.markdown("---")
     chart_header("Default Rate by Loan Grade")
     grade_default = df.groupby("loan_grade")["loan_status"].mean().mul(100).round(1).reset_index()
     grade_default.columns = ["Grade", "Default Rate"]
@@ -551,14 +544,11 @@ elif page == "📈 Portfolio Analysis":
             width=0.6, showlegend=False, cliponaxis=False))
     fig2.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-        dragmode=False,
-        xaxis=dict(fixedrange=True),
-        yaxis=dict(gridcolor="#1f2630", range=[0, grade_default["Default Rate"].max() * 1.2], fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", range=[0, grade_default["Default Rate"].max() * 1.2]),
         margin=dict(t=30, b=10, l=10, r=10), height=420)
     st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("---")
-
     chart_header("Risk-Adjusted Net Yield by Grade")
     chart_caption(
         f"Net Yield = Avg Interest Rate − (Default Rate × LGD). "
@@ -581,13 +571,12 @@ elif page == "📈 Portfolio Analysis":
             width=0.6, showlegend=False, cliponaxis=False))
     fig3.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-        dragmode=False,
         yaxis_title="Net Yield (%)",
-        xaxis=dict(fixedrange=True),
-        yaxis=dict(gridcolor="#1f2630", range=[min_yield * 1.15, max_yield * 1.5], fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", range=[min_yield * 1.15, max_yield * 1.5]),
         margin=dict(t=30, b=10, l=10, r=10), height=480)
     st.plotly_chart(fig3, use_container_width=True, config=CHART_CONFIG)
 
+    st.markdown("---")
     chart_header("Interest Rate vs Risk Score")
     chart_caption(
         "Each dot is a borrower. In a well-priced portfolio, dots trend downward left to right — "
@@ -598,9 +587,8 @@ elif page == "📈 Portfolio Analysis":
         labels={"risk_score": "Risk Score", "loan_int_rate": "Interest Rate (%)", "segment": "Segment"})
     fig4.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-        dragmode=False,
-        xaxis=dict(gridcolor="#1f2630", fixedrange=True),
-        yaxis=dict(gridcolor="#1f2630", fixedrange=True),
+        xaxis=dict(gridcolor="#1f2630"),
+        yaxis=dict(gridcolor="#1f2630"),
         margin=dict(t=10, b=10, l=10, r=10), height=480)
     st.plotly_chart(fig4, use_container_width=True, config=CHART_CONFIG)
 
@@ -639,6 +627,7 @@ elif page == "🎯 Capital Allocation Strategy":
     total_raw = sum(raw_targets.values())
     target_alloc = {seg: round(val / total_raw * 100, 1) for seg, val in raw_targets.items()}
 
+    st.markdown("---")
     chart_header("Exposure vs Loss Contribution")
     exp_loss_data = pd.DataFrame({
         "Segment": ORDER * 2,
@@ -653,15 +642,14 @@ elif page == "🎯 Capital Allocation Strategy":
         textfont=dict(size=14), cliponaxis=False)
     fig1.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-        dragmode=False,
         yaxis_title="Percentage (%)",
-        xaxis=dict(fixedrange=True),
-        yaxis=dict(gridcolor="#1f2630", range=[0, exp_loss_data["Value"].max() * 1.3], fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", range=[0, exp_loss_data["Value"].max() * 1.3]),
         bargap=0.2, bargroupgap=0.05,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         margin=dict(t=40, b=40, l=10, r=10), height=480)
     st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
 
+    st.markdown("---")
     chart_header("Recommended Portfolio Reallocation")
     max_alloc = max(max(r["exp_pct"] for r in rows), max(target_alloc[seg] for seg in ORDER))
     alloc_df = pd.DataFrame({"Segment": ORDER,
@@ -678,10 +666,8 @@ elif page == "🎯 Capital Allocation Strategy":
         textfont=dict(size=14), cliponaxis=False)
     fig2.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-        dragmode=False,
         xaxis_title="Allocation (%)",
-        xaxis=dict(gridcolor="#1f2630", range=[0, max_alloc * 1.3], fixedrange=True),
-        yaxis=dict(fixedrange=True),
+        xaxis=dict(gridcolor="#1f2630", range=[0, max_alloc * 1.3]),
         bargap=0.2, bargroupgap=0.1,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         margin=dict(t=40, b=40, l=10, r=80), height=480)
@@ -753,7 +739,6 @@ elif page == "🧪 Stress Testing & Scenarios":
         delta=f"{el_increase_pct}%", delta_color="inverse")
 
     st.markdown("")
-
     st.markdown(
         "<p style='color:#aaaaaa; font-size:13px; margin-bottom:8px;'>"
         "Full computation chain — Exposure × Default Rate × LGD = Expected Loss. "
@@ -822,6 +807,7 @@ elif page == "🧪 Stress Testing & Scenarios":
     st.markdown(s_header + s_body + "</tbody></table></div>", unsafe_allow_html=True)
     st.markdown("")
 
+    st.markdown("---")
     chart_header("Expected Loss: Base vs Stressed")
     el_compare = pd.DataFrame({"Segment": ORDER * 2,
         "Scenario": ["Base Case"] * 4 + [scenario] * 4,
@@ -836,14 +822,13 @@ elif page == "🧪 Stress Testing & Scenarios":
         textfont=dict(size=13), cliponaxis=False)
     fig1.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-        dragmode=False,
-        xaxis=dict(fixedrange=True),
-        yaxis=dict(gridcolor="#1f2630", range=[0, el_compare["Expected Loss ($ Mn)"].max() * 1.3], fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", range=[0, el_compare["Expected Loss ($ Mn)"].max() * 1.3]),
         bargap=0.2, bargroupgap=0.05,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         margin=dict(t=40, b=10, l=10, r=10), height=420)
     st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
 
+    st.markdown("---")
     chart_header("Default Rate: Base vs Stressed")
     dr_compare = pd.DataFrame({"Segment": ORDER * 2,
         "Scenario": ["Base Case"] * 4 + [scenario] * 4,
@@ -858,16 +843,13 @@ elif page == "🧪 Stress Testing & Scenarios":
         textfont=dict(size=13), cliponaxis=False)
     fig2.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-        dragmode=False,
-        xaxis=dict(fixedrange=True),
-        yaxis=dict(gridcolor="#1f2630", range=[0, dr_compare["Default Rate (%)"].max() * 1.3], fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", range=[0, dr_compare["Default Rate (%)"].max() * 1.3]),
         bargap=0.2, bargroupgap=0.05,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         margin=dict(t=40, b=10, l=10, r=10), height=420)
     st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("---")
-
     st.subheader("Section 2 — Capital Reallocation Simulator")
     st.caption(
         "Simulates future lending decisions — not movement of existing loans. "
@@ -941,7 +923,6 @@ elif page == "🧪 Stress Testing & Scenarios":
         delta_color="inverse")
 
     st.markdown("")
-
     st.markdown(
         f"<p style='color:#aaaaaa; font-size:13px; margin-top:4px; margin-bottom:16px;'>"
         f"Reallocation sourced proportionally — "
@@ -950,6 +931,8 @@ elif page == "🧪 Stress Testing & Scenarios":
         f"based on current exposure weights from the Segment Summary on Page 1.</p>",
         unsafe_allow_html=True)
 
+    st.markdown("---")
+    chart_header("Simulated Exposure Shift")
     realloc_data = pd.DataFrame({"Segment": ORDER * 2,
         "Type": ["Current"] * 4 + ["Simulated"] * 4,
         "Exposure ($ Mn)": [
@@ -970,10 +953,8 @@ elif page == "🧪 Stress Testing & Scenarios":
         textfont=dict(size=13), cliponaxis=False)
     fig_sim.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-        dragmode=False,
         yaxis_title="Exposure ($ Mn)",
-        xaxis=dict(fixedrange=True),
-        yaxis=dict(gridcolor="#1f2630", range=[0, realloc_data["Exposure ($ Mn)"].max() * 1.3], fixedrange=True),
+        yaxis=dict(gridcolor="#1f2630", range=[0, realloc_data["Exposure ($ Mn)"].max() * 1.3]),
         bargap=0.2, bargroupgap=0.05,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         margin=dict(t=40, b=10, l=10, r=10))
@@ -1115,7 +1096,6 @@ elif page == "📋 Management Recommendations":
 
     st.markdown("---")
     chart_header("Current vs Target Portfolio Allocation")
-
     final_alloc = pd.DataFrame({"Segment": ORDER,
         "Current %": [seg_stats[seg]["exp_pct"] for seg in ORDER],
         "Target %":  [target_alloc[seg]         for seg in ORDER]})
@@ -1131,10 +1111,8 @@ elif page == "📋 Management Recommendations":
         textfont=dict(size=14), cliponaxis=False)
     fig_final.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-        dragmode=False,
         xaxis_title="Allocation (%)",
-        xaxis=dict(gridcolor="#1f2630", range=[0, max_val * 1.3], fixedrange=True),
-        yaxis=dict(fixedrange=True),
+        xaxis=dict(gridcolor="#1f2630", range=[0, max_val * 1.3]),
         bargap=0.2, bargroupgap=0.1,
         legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
         margin=dict(t=40, b=10, l=80, r=80), height=350)
