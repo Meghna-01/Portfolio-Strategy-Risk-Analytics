@@ -626,8 +626,7 @@ elif page == "🎯 Capital Allocation Strategy":
         "without shrinking total book size.")
 
     st.caption(
-        "📌 Exposure % and Loss Contribution % below are drawn directly from the "
-        "Segment Summary table on the Executive Overview.")
+        "📌 All base figures below come from the Executive Overview.")
 
     rows = anchor_rows.copy()
     for r in rows:
@@ -709,8 +708,8 @@ elif page == "📉 Stress Testing & Scenarios":
         "causes less absolute damage than the same shock applied to HIGH-RISK.")
 
     st.caption(
-        "📌 Exposure figures and base default rates below come directly from the "
-        "Segment Summary table on the Executive Overview. EL = Exposure × Default Rate × LGD.")
+        "📌 All base figures below come from the Executive Overview. "
+        "EL = Exposure × Default Rate × LGD.")
 
     base_rows = []
     for r in anchor_rows:
@@ -758,8 +757,7 @@ elif page == "📉 Stress Testing & Scenarios":
     st.markdown("")
     st.markdown(
         "<p style='color:#aaaaaa; font-size:13px; margin-bottom:8px;'>"
-        "Full computation chain — Exposure × Default Rate × LGD = Expected Loss. "
-        "Every figure traces back to the Segment Summary on the Executive Overview.</p>",
+        "Full computation chain — Exposure × Default Rate × LGD = Expected Loss.</p>",
         unsafe_allow_html=True)
 
     el_hdr = (
@@ -947,7 +945,7 @@ elif page == "📉 Stress Testing & Scenarios":
         f"Reallocation sourced proportionally — "
         f"<b style='color:#FB8500'>{round(sub_weight*100,1)}% from SUBPRIME</b> and "
         f"<b style='color:#E63946'>{round(high_weight*100,1)}% from HIGH-RISK</b>, "
-        f"based on current exposure weights from the Segment Summary on the Executive Overview.</p>",
+        f"based on current exposure weights.</p>",
         unsafe_allow_html=True)
 
     st.markdown("---")
