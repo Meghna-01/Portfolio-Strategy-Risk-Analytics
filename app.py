@@ -39,11 +39,24 @@ st.markdown("""
     [data-testid="collapsedControl"] { display: none !important; }
 
     /* ── MAIN CONTAINER ── */
-    /* padding-top = height of fixed tab bar so header isn't hidden behind it */
     .main .block-container {
-        padding: 55px 1.5rem 6rem 1.5rem !important;
+        padding: 52px 2rem 6rem 2rem !important;
         max-width: 1440px !important;
         margin-top: 0 !important;
+    }
+
+    /* ── KILL GAP BETWEEN HEADER AND KPI CARDS ── */
+    [data-testid="stTabs"] {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+    [data-baseweb="tab-panel"] {
+        padding-top: 0 !important;
+        margin-top: 0 !important;
+    }
+    [data-baseweb="tab-panel"] > div:first-child {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
     }
 
     /* ── TRULY STICKY / FIXED TAB BAR ── */
@@ -63,28 +76,21 @@ st.markdown("""
         display: flex !important;
         width: 100% !important;
         box-sizing: border-box !important;
-        /* Stretch tabs across full width */
         justify-content: stretch !important;
     }
 
-    /* Tab panel — no extra padding needed, block-container handles it */
-    [data-baseweb="tab-panel"] {
-        padding-top: 0 !important;
-    }
-
-    /* ── TAB STYLES — full width, partition lines, cyan active ── */
+    /* ── TAB STYLES ── */
     [data-baseweb="tab"] {
         font-family: 'Inter', sans-serif !important;
-        font-size: 15px !important;
+        font-size: 17px !important;
         font-weight: 500 !important;
-        color: #aaaaaa !important;
-        padding: 18px 0 !important;
+        color: #cccccc !important;
+        padding: 16px 0 !important;
         border-bottom: 3px solid transparent !important;
         border-right: 1px solid #2d3447 !important;
         background: transparent !important;
         transition: color 0.2s ease !important;
         white-space: nowrap !important;
-        /* Each tab fills equal share of the bar */
         flex: 1 !important;
         text-align: center !important;
         justify-content: center !important;
@@ -104,13 +110,24 @@ st.markdown("""
     }
 
     /* ── TYPOGRAPHY ── */
-    h1 { font-size: 32px !important; font-weight: 800 !important; color: #ffffff !important;
+    h1 { font-size: 34px !important; font-weight: 800 !important; color: #ffffff !important;
          letter-spacing: -0.5px !important; line-height: 1.2 !important; margin-bottom: 6px !important; }
     h2 { font-size: 26px !important; font-weight: 700 !important; color: #ffffff !important; }
-    h3 { font-size: 20px !important; font-weight: 600 !important; color: #ffffff !important; }
-    p, li { font-size: 16px !important; line-height: 1.7 !important; color: #cccccc !important; }
-    .stCaption, [data-testid="stCaptionContainer"] p {
-        font-size: 14px !important; color: #aaaaaa !important;
+    h3 { font-size: 21px !important; font-weight: 600 !important; color: #ffffff !important; }
+
+    /* Target Streamlit's paragraph and caption wrappers directly */
+    p, li,
+    [data-testid="stMarkdownContainer"] p,
+    [data-testid="stMarkdownContainer"] li {
+        font-size: 16px !important;
+        line-height: 1.75 !important;
+        color: #cccccc !important;
+    }
+    .stCaption,
+    [data-testid="stCaptionContainer"] p,
+    [data-testid="stCaptionContainer"] {
+        font-size: 15px !important;
+        color: #aaaaaa !important;
     }
 
     /* ── METRICS ── */
@@ -119,17 +136,18 @@ st.markdown("""
         color: #00B4D8 !important; font-family: 'Inter', sans-serif !important;
     }
     [data-testid="stMetricLabel"] {
-        font-size: 13px !important; color: #aaaaaa !important;
+        font-size: 14px !important; color: #aaaaaa !important;
         font-weight: 500 !important; text-transform: uppercase !important;
     }
-    [data-testid="stMetricDelta"] { font-size: 13px !important; }
+    [data-testid="stMetricDelta"] { font-size: 14px !important; }
 
-    /* ── KPI CARDS — centre aligned, balanced font sizes ── */
+    /* ── KPI CARDS ── */
     .kpi-grid {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
         gap: 14px;
-        margin-bottom: 28px;
+        margin-bottom: 24px;
+        margin-top: 0 !important;
     }
     .kpi-card {
         background: #1a1f2e;
@@ -141,7 +159,7 @@ st.markdown("""
     }
     .kpi-card:hover { border-color: #00B4D8; }
     .kpi-label {
-        font-size: 11px !important;
+        font-size: 12px !important;
         color: #aaaaaa !important;
         font-weight: 600 !important;
         text-transform: uppercase !important;
@@ -151,7 +169,7 @@ st.markdown("""
         line-height: 1.4 !important;
     }
     .kpi-value {
-        font-size: 22px !important;
+        font-size: 24px !important;
         font-weight: 800 !important;
         color: #00B4D8 !important;
         margin: 0 !important;
@@ -160,7 +178,7 @@ st.markdown("""
         text-align: center !important;
     }
     .kpi-sub {
-        font-size: 11px !important;
+        font-size: 12px !important;
         color: #999999 !important;
         margin: 6px 0 0 0 !important;
         text-align: center !important;
@@ -177,7 +195,7 @@ st.markdown("""
     }
     .insight-box p {
         font-size: 16px !important; color: #e0e0e0 !important;
-        margin: 0 !important; line-height: 1.7 !important;
+        margin: 0 !important; line-height: 1.75 !important;
     }
 
     /* ── SECTION DIVIDER ── */
@@ -189,25 +207,41 @@ st.markdown("""
 
     /* ── PLATFORM HEADER ── */
     .platform-header {
-        padding: 16px 0 16px 0;
+        padding: 12px 0 10px 0;
         border-bottom: 1px solid #2d3447;
-        margin-bottom: 24px;
+        margin-bottom: 10px !important;
     }
 
     /* ── FIXED FOOTER ── */
     .footer-bar {
         position: fixed; bottom: 0; left: 0; right: 0;
-        height: 40px;
-        background: rgba(13,17,23,0.98);
+        height: 44px;
+        background: rgba(13,17,23,0.99);
         border-top: 1px solid #2d3447;
         display: flex; align-items: center;
         justify-content: space-between;
-        padding: 0 24px;
+        padding: 0 28px;
         z-index: 1000;
         backdrop-filter: blur(8px);
     }
+    .footer-left {
+        font-size: 13px !important;
+        color: #999999 !important;
+        font-weight: 500 !important;
+        font-family: 'Inter', sans-serif !important;
+    }
+    .footer-right {
+        font-size: 13px !important;
+        color: #ffffff !important;
+        font-family: 'Inter', sans-serif !important;
+    }
+    .footer-name {
+        color: #00B4D8 !important;
+        font-weight: 700 !important;
+        font-size: 14px !important;
+    }
 
-    /* ── SELECTBOX — cyan border ── */
+    /* ── SELECTBOX ── */
     [data-testid="stSelectbox"] > div > div {
         border: 1px solid #00B4D8 !important;
         border-radius: 8px !important;
@@ -215,43 +249,20 @@ st.markdown("""
         font-size: 15px !important;
     }
 
-    /* ── COL DIVIDER — hidden on mobile ── */
+    /* ── COL DIVIDER ── */
     .col-divider-wrap { display: block; }
 
-    /* ── MOBILE 768px ── */
+    /* ── MOBILE — minimal, don't break laptop ── */
     @media (max-width: 768px) {
         .main .block-container {
-            padding: 55px 0.6rem 6rem 0.6rem !important;
+            padding: 52px 0.8rem 6rem 0.8rem !important;
         }
         [data-baseweb="tab"] {
-            font-size: 10px !important;
-            padding: 14px 0 !important;
+            font-size: 11px !important;
+            padding: 12px 0 !important;
         }
-        h1 { font-size: 22px !important; }
-        h2 { font-size: 19px !important; }
-        h3 { font-size: 16px !important; }
-        p  { font-size: 14px !important; }
         .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
-        [data-testid="stMetricValue"] { font-size: 24px !important; }
-        .kpi-value { font-size: 20px !important; }
-        .footer-bar {
-            flex-direction: column; height: auto;
-            padding: 6px 12px; gap: 2px;
-        }
-        [data-testid="column"] {
-            width: 100% !important; flex: 100% !important; min-width: 100% !important;
-        }
         .col-divider-wrap { display: none !important; }
-        .js-plotly-plot, .plotly { width: 100% !important; }
-        table { display: block !important; overflow-x: auto !important; white-space: nowrap !important; }
-    }
-
-    /* ── MOBILE 480px ── */
-    @media (max-width: 480px) {
-        [data-baseweb="tab"] { font-size: 8px !important; padding: 12px 0 !important; }
-        .kpi-grid { grid-template-columns: 1fr !important; }
-        h1 { font-size: 19px !important; }
-        p  { font-size: 13px !important; }
     }
     </style>
 """, unsafe_allow_html=True)
@@ -268,10 +279,10 @@ function initScrollEffect() {
     main.addEventListener('scroll', function() {
         const tabs = doc.querySelectorAll('[data-baseweb="tab"]');
         if (main.scrollTop > 60) {
-            tabs.forEach(t => { t.style.fontSize='12px'; t.style.padding='10px 0'; });
+            tabs.forEach(t => { t.style.fontSize='13px'; t.style.padding='10px 0'; });
             tabList.style.boxShadow = '0 4px 20px rgba(0,0,0,0.6)';
         } else {
-            tabs.forEach(t => { t.style.fontSize='15px'; t.style.padding='18px 0'; });
+            tabs.forEach(t => { t.style.fontSize='17px'; t.style.padding='16px 0'; });
             tabList.style.boxShadow = 'none';
         }
     });
@@ -283,20 +294,18 @@ initScrollEffect();
 # ── Fixed footer ──
 st.markdown("""
 <div class="footer-bar">
-    <span style="font-size:12px; color:#999999; font-weight:500;">
-        Credit Risk Intelligence Platform
-    </span>
-    <span style="font-size:12px; color:#aaaaaa;">
-        Built by <span style="color:#00B4D8; font-weight:600;">Meghna</span>
+    <span class="footer-left">Credit Risk Intelligence Platform</span>
+    <span class="footer-right">
+        Built by <span class="footer-name">Meghna</span>
     </span>
 </div>
 """, unsafe_allow_html=True)
 
-# ── Platform header — no cyan label, just title ──
+# ── Platform header ──
 st.markdown("""
 <div class="platform-header">
     <h1 style="margin:0;">Portfolio Strategy & Risk Analytics</h1>
-    <p style="font-size:14px !important; color:#aaaaaa !important; margin:5px 0 0 0 !important;">
+    <p style="font-size:15px !important; color:#aaaaaa !important; margin:5px 0 0 0 !important;">
         Consumer lending · 32,572 borrowers · $312.3 Mn exposure</p>
 </div>
 """, unsafe_allow_html=True)
@@ -344,12 +353,12 @@ def insight_box(text):
 
 def chart_header(text):
     st.markdown(
-        f"<h3 style='text-align:center;color:white;margin-bottom:4px;font-size:19px !important;'>{text}</h3>",
+        f"<h3 style='text-align:center;color:white;margin-bottom:4px;font-size:20px !important;'>{text}</h3>",
         unsafe_allow_html=True)
 
 def chart_caption(text):
     st.markdown(
-        f"<p style='text-align:center;color:#aaaaaa;font-size:13px !important;"
+        f"<p style='text-align:center;color:#aaaaaa;font-size:14px !important;"
         f"margin-top:0;margin-bottom:14px;'>{text}</p>",
         unsafe_allow_html=True)
 
@@ -375,9 +384,9 @@ def lgd_inline(key_suffix, context_text=""):
     st.markdown(f"""
         <div style="background:#111827;border:1px solid #2d3447;border-radius:10px;
         padding:18px 22px;margin:14px 0 20px 0;">
-            <p style="color:#ffffff;font-size:14px !important;font-weight:600;
+            <p style="color:#ffffff;font-size:15px !important;font-weight:600;
             margin:0 0 4px 0;">⚙️ Scenario Assumption — LGD</p>
-            <p style="color:#aaaaaa;font-size:13px !important;margin:0 0 6px 0;">{context_text}</p>
+            <p style="color:#aaaaaa;font-size:14px !important;margin:0 0 6px 0;">{context_text}</p>
         </div>
     """, unsafe_allow_html=True)
     val = st.slider(
@@ -387,14 +396,14 @@ def lgd_inline(key_suffix, context_text=""):
         step=5, key=f"lgd_{key_suffix}")
     st.session_state.lgd_value = val
     st.markdown(
-        f"<p style='color:#aaaaaa;font-size:13px !important;margin:4px 0 14px 0;'>"
+        f"<p style='color:#aaaaaa;font-size:14px !important;margin:4px 0 14px 0;'>"
         f"LGD = {val}%</p>",
         unsafe_allow_html=True)
     return val / 100
 
 def render_anchor_table():
     st.markdown(
-        "<p style='color:#aaaaaa;font-size:13px !important;margin-bottom:10px;'>"
+        "<p style='color:#aaaaaa;font-size:14px !important;margin-bottom:10px;'>"
         "Every number across this entire dashboard traces back to this table. "
         "Exposure = sum of loan amounts. Default Rate = share of loans that defaulted. "
         "Loss Contribution = share of total dollar losses generated by that segment.</p>",
@@ -403,35 +412,35 @@ def render_anchor_table():
         '<div style="overflow-x:auto;margin-bottom:20px;">'
         '<table style="width:100%;border-collapse:collapse;">'
         '<thead><tr style="background:#1a1f2e;">'
-        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Segment</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Borrowers</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Exposure</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Exposure %</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Default Rate</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Loss Contribution</th>'
+        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Segment</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Borrowers</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Exposure</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Exposure %</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Default Rate</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Loss Contribution</th>'
         '</tr></thead><tbody>'
     )
     body = ""
     for r in anchor_rows:
         body += (
             f'<tr style="background:#0e1117;border-bottom:1px solid #1a1f2e;">'
-            f'<td style="padding:12px 16px;color:{seg_colors[r["seg"]]};font-weight:700;font-size:14px;">{r["seg"]}</td>'
-            f'<td style="padding:12px 16px;text-align:right;color:#cccccc;font-size:14px;">{r["n"]:,}</td>'
-            f'<td style="padding:12px 16px;text-align:right;color:#cccccc;font-size:14px;">${r["exp_mn"]} Mn</td>'
-            f'<td style="padding:12px 16px;text-align:right;color:#cccccc;font-size:14px;">{r["exp_pct"]}%</td>'
-            f'<td style="padding:12px 16px;text-align:right;color:#cccccc;font-size:14px;">{r["dr"]}%</td>'
-            f'<td style="padding:12px 16px;text-align:right;color:#cccccc;font-size:14px;">{r["loss_pct"]}%</td>'
+            f'<td style="padding:12px 16px;color:{seg_colors[r["seg"]]};font-weight:700;font-size:15px;">{r["seg"]}</td>'
+            f'<td style="padding:12px 16px;text-align:right;color:#cccccc;font-size:15px;">{r["n"]:,}</td>'
+            f'<td style="padding:12px 16px;text-align:right;color:#cccccc;font-size:15px;">${r["exp_mn"]} Mn</td>'
+            f'<td style="padding:12px 16px;text-align:right;color:#cccccc;font-size:15px;">{r["exp_pct"]}%</td>'
+            f'<td style="padding:12px 16px;text-align:right;color:#cccccc;font-size:15px;">{r["dr"]}%</td>'
+            f'<td style="padding:12px 16px;text-align:right;color:#cccccc;font-size:15px;">{r["loss_pct"]}%</td>'
             f'</tr>'
         )
     total_exp_mn = round(total_exposure_all / 1_000_000, 2)
     body += (
         f'<tr style="background:#1a1f2e;">'
-        f'<td style="padding:12px 16px;color:#fff;font-weight:700;font-size:14px;">Total</td>'
-        f'<td style="padding:12px 16px;text-align:right;color:#fff;font-weight:700;font-size:14px;">{len(df):,}</td>'
-        f'<td style="padding:12px 16px;text-align:right;color:#fff;font-weight:700;font-size:14px;">${total_exp_mn} Mn</td>'
-        f'<td style="padding:12px 16px;text-align:right;color:#fff;font-weight:700;font-size:14px;">100%</td>'
-        f'<td style="padding:12px 16px;text-align:right;color:#aaa;font-size:14px;">—</td>'
-        f'<td style="padding:12px 16px;text-align:right;color:#fff;font-weight:700;font-size:14px;">100%</td>'
+        f'<td style="padding:12px 16px;color:#fff;font-weight:700;font-size:15px;">Total</td>'
+        f'<td style="padding:12px 16px;text-align:right;color:#fff;font-weight:700;font-size:15px;">{len(df):,}</td>'
+        f'<td style="padding:12px 16px;text-align:right;color:#fff;font-weight:700;font-size:15px;">${total_exp_mn} Mn</td>'
+        f'<td style="padding:12px 16px;text-align:right;color:#fff;font-weight:700;font-size:15px;">100%</td>'
+        f'<td style="padding:12px 16px;text-align:right;color:#aaa;font-size:15px;">—</td>'
+        f'<td style="padding:12px 16px;text-align:right;color:#fff;font-weight:700;font-size:15px;">100%</td>'
         f'</tr>'
     )
     st.markdown(hdr + body + "</tbody></table></div>", unsafe_allow_html=True)
@@ -507,10 +516,10 @@ with tab1:
         marker_color="#00B4D8", opacity=0.80, showlegend=False))
     fig_dist.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white", font_family="Inter",
-        xaxis=dict(gridcolor="#1f2630", title="Risk Score", title_font_size=13,
-                   tickfont_size=12, range=[0,100]),
+        xaxis=dict(gridcolor="#1f2630", title="Risk Score", title_font_size=14,
+                   tickfont_size=13, range=[0,100]),
         yaxis=dict(gridcolor="#1f2630", title="Number of Borrowers",
-                   title_font_size=13, tickfont_size=12),
+                   title_font_size=14, tickfont_size=13),
         margin=dict(t=60, b=20, l=20, r=20), height=400)
     st.plotly_chart(fig_dist, use_container_width=True, config=CHART_CONFIG)
 
@@ -530,9 +539,9 @@ with tab1:
         seg_counts = seg_counts.sort_values("Segment")
         fig1 = px.pie(seg_counts, names="Segment", values="Count", hole=0.55,
             color_discrete_sequence=PALETTE)
-        fig1.update_traces(textfont_size=13)
+        fig1.update_traces(textfont_size=14)
         fig1.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-            font_family="Inter", showlegend=True, legend_font_size=13,
+            font_family="Inter", showlegend=True, legend_font_size=14,
             margin=dict(t=20, b=20, l=20, r=20), height=360)
         st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
 
@@ -547,13 +556,13 @@ with tab1:
             fig2.add_trace(go.Bar(
                 x=[row["Segment"]], y=[row["Default Rate"]],
                 text=[f"{row['Default Rate']}%"],
-                textposition="outside", textfont=dict(size=14, color="white"),
+                textposition="outside", textfont=dict(size=15, color="white"),
                 marker_color=PALETTE[i], width=0.55, showlegend=False, cliponaxis=False))
         fig2.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
             font_family="Inter",
             yaxis=dict(gridcolor="#1f2630", range=[0, seg_default["Default Rate"].max()*1.3],
-                       tickfont_size=12),
-            xaxis=dict(tickfont_size=13),
+                       tickfont_size=13),
+            xaxis=dict(tickfont_size=14),
             margin=dict(t=30, b=20, l=20, r=20), height=360)
         st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
@@ -569,46 +578,46 @@ with tab1:
     <div style="overflow-x:auto;margin-bottom:20px;">
     <table style="width:100%;border-collapse:collapse;">
     <thead><tr style="background:#1a1f2e;">
-        <th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Risk Factor</th>
-        <th style="padding:12px 16px;text-align:center;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Spread</th>
-        <th style="padding:12px 16px;text-align:center;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Max Penalty</th>
-        <th style="padding:12px 16px;text-align:center;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Weight</th>
-        <th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Signal</th>
+        <th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Risk Factor</th>
+        <th style="padding:12px 16px;text-align:center;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Spread</th>
+        <th style="padding:12px 16px;text-align:center;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Max Penalty</th>
+        <th style="padding:12px 16px;text-align:center;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Weight</th>
+        <th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Signal</th>
     </tr></thead><tbody>
     <tr style="background:#0e1117;border-bottom:1px solid #1a1f2e;">
-        <td style="padding:12px 16px;color:#ccc;font-size:14px;">📊 Loan-to-Income Ratio</td>
-        <td style="padding:12px 16px;text-align:center;color:#00B4D8;font-weight:700;font-size:14px;">62 pts</td>
-        <td style="padding:12px 16px;text-align:center;color:#ccc;font-size:14px;">−66</td>
-        <td style="padding:12px 16px;text-align:center;color:#00B4D8;font-weight:700;font-size:14px;">66%</td>
-        <td style="padding:12px 16px;color:#ccc;font-size:14px;">Strongest predictor</td>
+        <td style="padding:12px 16px;color:#ccc;font-size:15px;">📊 Loan-to-Income Ratio</td>
+        <td style="padding:12px 16px;text-align:center;color:#00B4D8;font-weight:700;font-size:15px;">62 pts</td>
+        <td style="padding:12px 16px;text-align:center;color:#ccc;font-size:15px;">−66</td>
+        <td style="padding:12px 16px;text-align:center;color:#00B4D8;font-weight:700;font-size:15px;">66%</td>
+        <td style="padding:12px 16px;color:#ccc;font-size:15px;">Strongest predictor</td>
     </tr>
     <tr style="background:#0e1117;border-bottom:1px solid #1a1f2e;">
-        <td style="padding:12px 16px;color:#ccc;font-size:14px;">📋 Prior Default on File</td>
-        <td style="padding:12px 16px;text-align:center;color:#FFB703;font-weight:700;font-size:14px;">19 pts</td>
-        <td style="padding:12px 16px;text-align:center;color:#ccc;font-size:14px;">−20</td>
-        <td style="padding:12px 16px;text-align:center;color:#FFB703;font-weight:700;font-size:14px;">20%</td>
-        <td style="padding:12px 16px;color:#ccc;font-size:14px;">Strong signal</td>
+        <td style="padding:12px 16px;color:#ccc;font-size:15px;">📋 Prior Default on File</td>
+        <td style="padding:12px 16px;text-align:center;color:#FFB703;font-weight:700;font-size:15px;">19 pts</td>
+        <td style="padding:12px 16px;text-align:center;color:#ccc;font-size:15px;">−20</td>
+        <td style="padding:12px 16px;text-align:center;color:#FFB703;font-weight:700;font-size:15px;">20%</td>
+        <td style="padding:12px 16px;color:#ccc;font-size:15px;">Strong signal</td>
     </tr>
     <tr style="background:#0e1117;border-bottom:1px solid #1a1f2e;">
-        <td style="padding:12px 16px;color:#ccc;font-size:14px;">💼 Employment Length</td>
-        <td style="padding:12px 16px;text-align:center;color:#FB8500;font-weight:700;font-size:14px;">11 pts</td>
-        <td style="padding:12px 16px;text-align:center;color:#ccc;font-size:14px;">−12</td>
-        <td style="padding:12px 16px;text-align:center;color:#FB8500;font-weight:700;font-size:14px;">12%</td>
-        <td style="padding:12px 16px;color:#ccc;font-size:14px;">Moderate signal</td>
+        <td style="padding:12px 16px;color:#ccc;font-size:15px;">💼 Employment Length</td>
+        <td style="padding:12px 16px;text-align:center;color:#FB8500;font-weight:700;font-size:15px;">11 pts</td>
+        <td style="padding:12px 16px;text-align:center;color:#ccc;font-size:15px;">−12</td>
+        <td style="padding:12px 16px;text-align:center;color:#FB8500;font-weight:700;font-size:15px;">12%</td>
+        <td style="padding:12px 16px;color:#ccc;font-size:15px;">Moderate signal</td>
     </tr>
     <tr style="background:#0e1117;border-bottom:1px solid #1a1f2e;">
-        <td style="padding:12px 16px;color:#ccc;font-size:14px;">🕐 Credit History Length</td>
-        <td style="padding:12px 16px;text-align:center;color:#888;font-weight:700;font-size:14px;">2 pts</td>
-        <td style="padding:12px 16px;text-align:center;color:#ccc;font-size:14px;">−2</td>
-        <td style="padding:12px 16px;text-align:center;color:#888;font-weight:700;font-size:14px;">2%</td>
-        <td style="padding:12px 16px;color:#ccc;font-size:14px;">Weak signal</td>
+        <td style="padding:12px 16px;color:#ccc;font-size:15px;">🕐 Credit History Length</td>
+        <td style="padding:12px 16px;text-align:center;color:#888;font-weight:700;font-size:15px;">2 pts</td>
+        <td style="padding:12px 16px;text-align:center;color:#ccc;font-size:15px;">−2</td>
+        <td style="padding:12px 16px;text-align:center;color:#888;font-weight:700;font-size:15px;">2%</td>
+        <td style="padding:12px 16px;color:#ccc;font-size:15px;">Weak signal</td>
     </tr>
     <tr style="background:#1a1f2e;">
-        <td style="padding:12px 16px;color:#fff;font-weight:700;font-size:14px;">Total</td>
-        <td style="padding:12px 16px;text-align:center;color:#fff;font-weight:700;font-size:14px;">94 pts</td>
+        <td style="padding:12px 16px;color:#fff;font-weight:700;font-size:15px;">Total</td>
+        <td style="padding:12px 16px;text-align:center;color:#fff;font-weight:700;font-size:15px;">94 pts</td>
         <td style="padding:12px 16px;"></td>
-        <td style="padding:12px 16px;text-align:center;color:#fff;font-weight:700;font-size:14px;">100%</td>
-        <td style="padding:12px 16px;color:#aaa;font-size:13px;">Score range: 0–100</td>
+        <td style="padding:12px 16px;text-align:center;color:#fff;font-weight:700;font-size:15px;">100%</td>
+        <td style="padding:12px 16px;color:#aaa;font-size:14px;">Score range: 0–100</td>
     </tr></tbody></table></div>
     """
     st.markdown(scoring_html, unsafe_allow_html=True)
@@ -654,9 +663,9 @@ with tab2:
         labels=dict(x="Risk Segment", y="Loan Grade", color="# Borrowers"))
     fig_heat.update_traces(
         xgap=2, ygap=2,
-        textfont=dict(size=14, color="white"))   # ← all heatmap numbers white
+        textfont=dict(size=14, color="white"))
     fig_heat.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-        font_family="Inter", xaxis=dict(tickfont_size=13), yaxis=dict(tickfont_size=13),
+        font_family="Inter", xaxis=dict(tickfont_size=14), yaxis=dict(tickfont_size=14),
         margin=dict(t=20, b=20, l=20, r=20), height=420)
     st.plotly_chart(fig_heat, use_container_width=True, config=CHART_CONFIG)
 
@@ -676,14 +685,14 @@ with tab2:
             fig1.add_trace(go.Bar(
                 x=[row["Grade"]], y=[row["Exposure ($ Mn)"]],
                 text=[f"${row['Exposure ($ Mn)']} Mn"],
-                textposition="outside", textfont=dict(size=13, color="white"),
+                textposition="outside", textfont=dict(size=14, color="white"),
                 marker_color=grade_colors[i % len(grade_colors)],
                 width=0.55, showlegend=False, cliponaxis=False))
         fig1.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
             font_family="Inter", yaxis_title="Exposure ($ Mn)",
             yaxis=dict(gridcolor="#1f2630", range=[0, grade_exposure["Exposure ($ Mn)"].max()*1.25],
-                       tickfont_size=12),
-            xaxis=dict(tickfont_size=13),
+                       tickfont_size=13),
+            xaxis=dict(tickfont_size=14),
             margin=dict(t=30, b=20, l=20, r=20), height=360)
         st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
     with col2:
@@ -703,13 +712,13 @@ with tab2:
             fig2.add_trace(go.Bar(
                 x=[row["Grade"]], y=[row["Default Rate"]],
                 text=[f"{row['Default Rate']}%"],
-                textposition="outside", textfont=dict(size=13, color="white"),
+                textposition="outside", textfont=dict(size=14, color="white"),
                 marker_color=f"rgb({r},{g},{b})",
                 width=0.55, showlegend=False, cliponaxis=False))
         fig2.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
             font_family="Inter",
-            yaxis=dict(gridcolor="#1f2630", range=[0, max_dr*1.25], tickfont_size=12),
-            xaxis=dict(tickfont_size=13),
+            yaxis=dict(gridcolor="#1f2630", range=[0, max_dr*1.25], tickfont_size=13),
+            xaxis=dict(tickfont_size=14),
             margin=dict(t=30, b=20, l=20, r=20), height=360)
         st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
@@ -737,13 +746,13 @@ with tab2:
             fig3.add_trace(go.Bar(
                 x=[row["loan_grade"]], y=[row["Net_Yield"]],
                 text=[f"{row['Net_Yield']}%"],
-                textposition="outside", textfont=dict(size=13, color="white"),
+                textposition="outside", textfont=dict(size=14, color="white"),
                 marker_color="#00B4D8" if row["Net_Yield"]>=0 else "#E63946",
                 width=0.55, showlegend=False, cliponaxis=False))
         fig3.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
             font_family="Inter", yaxis_title="Net Yield (%)",
-            yaxis=dict(gridcolor="#1f2630", range=[min_y*1.2, max_y*1.5], tickfont_size=12),
-            xaxis=dict(tickfont_size=13),
+            yaxis=dict(gridcolor="#1f2630", range=[min_y*1.2, max_y*1.5], tickfont_size=13),
+            xaxis=dict(tickfont_size=14),
             margin=dict(t=30, b=20, l=20, r=20), height=400)
         st.plotly_chart(fig3, use_container_width=True, config=CHART_CONFIG)
     with col4:
@@ -756,9 +765,9 @@ with tab2:
         fig4.update_traces(marker_size=5)
         fig4.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
             font_family="Inter",
-            xaxis=dict(gridcolor="#1f2630", tickfont_size=12),
-            yaxis=dict(gridcolor="#1f2630", tickfont_size=12),
-            legend_font_size=12,
+            xaxis=dict(gridcolor="#1f2630", tickfont_size=13),
+            yaxis=dict(gridcolor="#1f2630", tickfont_size=13),
+            legend_font_size=13,
             margin=dict(t=20, b=20, l=20, r=20), height=400)
         st.plotly_chart(fig4, use_container_width=True, config=CHART_CONFIG)
 
@@ -796,7 +805,6 @@ with tab3:
     section_divider()
 
     chart_header("Exposure vs Loss Contribution")
-    # caption removed — fix #10
 
     exp_loss_data = pd.DataFrame({
         "Segment": ORDER*2,
@@ -808,12 +816,12 @@ with tab3:
         color_discrete_map={"Exposure %":"#00B4D8","Loss Contribution %":"#E63946"},
         category_orders={"Segment":ORDER})
     fig_el.update_traces(texttemplate="%{text}%", textposition="outside",
-        textfont=dict(size=14), cliponaxis=False)
+        textfont=dict(size=15), cliponaxis=False)
     fig_el.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
         font_family="Inter", yaxis_title="Percentage (%)",
-        yaxis=dict(gridcolor="#1f2630", range=[0, exp_loss_data["Value"].max()*1.3], tickfont_size=12),
-        xaxis=dict(tickfont_size=14), bargap=0.2, bargroupgap=0.05,
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font_size=13),
+        yaxis=dict(gridcolor="#1f2630", range=[0, exp_loss_data["Value"].max()*1.3], tickfont_size=13),
+        xaxis=dict(tickfont_size=15), bargap=0.2, bargroupgap=0.05,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font_size=14),
         margin=dict(t=50, b=20, l=20, r=20), height=420)
     st.plotly_chart(fig_el, use_container_width=True, config=CHART_CONFIG)
 
@@ -834,12 +842,12 @@ with tab3:
         color_discrete_map={"Current %":"#FFB703","Target %":"#00B4D8"},
         category_orders={"Segment":ORDER})
     fig_alloc.update_traces(texttemplate="%{x}%", textposition="outside",
-        textfont=dict(size=14), cliponaxis=False)
+        textfont=dict(size=15), cliponaxis=False)
     fig_alloc.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
         font_family="Inter", xaxis_title="Allocation (%)",
-        xaxis=dict(gridcolor="#1f2630", range=[0, max_alloc*1.3], tickfont_size=12),
-        yaxis=dict(tickfont_size=14), bargap=0.2, bargroupgap=0.1,
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font_size=13),
+        xaxis=dict(gridcolor="#1f2630", range=[0, max_alloc*1.3], tickfont_size=13),
+        yaxis=dict(tickfont_size=15), bargap=0.2, bargroupgap=0.1,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font_size=14),
         margin=dict(t=50, b=20, l=20, r=100), height=360)
     st.plotly_chart(fig_alloc, use_container_width=True, config=CHART_CONFIG)
 
@@ -901,7 +909,7 @@ with tab4:
         delta=f"{el_increase_pct}%", delta_color="inverse")
 
     st.markdown(
-        "<p style='color:#aaaaaa;font-size:13px !important;margin:10px 0 8px 0;'>"
+        "<p style='color:#aaaaaa;font-size:14px !important;margin:10px 0 8px 0;'>"
         "Full computation chain — Exposure × Default Rate × LGD = Expected Loss.</p>",
         unsafe_allow_html=True)
 
@@ -910,11 +918,11 @@ with tab4:
         '<div style="overflow-x:auto;margin-bottom:16px;">'
         '<table style="width:100%;border-collapse:collapse;">'
         '<thead><tr style="background:#1a1f2e;">'
-        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Segment</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Exposure</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Base DR</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">LGD</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Base EL</th>'
+        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Segment</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Exposure</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Base DR</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">LGD</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Base EL</th>'
         '</tr></thead><tbody>'
     )
     el_body = ""
@@ -922,20 +930,20 @@ with tab4:
         exp_mn = round(r["exp"]/1_000_000, 2)
         el_body += (
             f'<tr style="background:#0e1117;border-bottom:1px solid #1a1f2e;">'
-            f'<td style="padding:12px 16px;color:{seg_colors[r["seg"]]};font-weight:700;font-size:14px;">{r["seg"]}</td>'
-            f'<td style="padding:12px 16px;text-align:right;color:#ccc;font-size:14px;">${exp_mn} Mn</td>'
-            f'<td style="padding:12px 16px;text-align:right;color:#ccc;font-size:14px;">{r["base_dr"]}%</td>'
-            f'<td style="padding:12px 16px;text-align:right;color:#ccc;font-size:14px;">{int(LGD_p4*100)}%</td>'
-            f'<td style="padding:12px 16px;text-align:right;color:#00B4D8;font-weight:700;font-size:14px;">${r["base_el"]} Mn</td>'
+            f'<td style="padding:12px 16px;color:{seg_colors[r["seg"]]};font-weight:700;font-size:15px;">{r["seg"]}</td>'
+            f'<td style="padding:12px 16px;text-align:right;color:#ccc;font-size:15px;">${exp_mn} Mn</td>'
+            f'<td style="padding:12px 16px;text-align:right;color:#ccc;font-size:15px;">{r["base_dr"]}%</td>'
+            f'<td style="padding:12px 16px;text-align:right;color:#ccc;font-size:15px;">{int(LGD_p4*100)}%</td>'
+            f'<td style="padding:12px 16px;text-align:right;color:#00B4D8;font-weight:700;font-size:15px;">${r["base_el"]} Mn</td>'
             f'</tr>')
     total_exp_mn = round(sum(r["exp"] for r in stress_rows)/1_000_000, 2)
     el_body += (
         f'<tr style="background:#1a1f2e;">'
-        f'<td style="padding:12px 16px;color:#fff;font-weight:700;font-size:14px;">Total</td>'
-        f'<td style="padding:12px 16px;text-align:right;color:#fff;font-weight:700;font-size:14px;">${total_exp_mn} Mn</td>'
-        f'<td style="padding:12px 16px;text-align:right;color:#aaa;font-size:14px;">—</td>'
-        f'<td style="padding:12px 16px;text-align:right;color:#aaa;font-size:14px;">{int(LGD_p4*100)}%</td>'
-        f'<td style="padding:12px 16px;text-align:right;color:#fff;font-weight:700;font-size:14px;">${base_total_el} Mn</td>'
+        f'<td style="padding:12px 16px;color:#fff;font-weight:700;font-size:15px;">Total</td>'
+        f'<td style="padding:12px 16px;text-align:right;color:#fff;font-weight:700;font-size:15px;">${total_exp_mn} Mn</td>'
+        f'<td style="padding:12px 16px;text-align:right;color:#aaa;font-size:15px;">—</td>'
+        f'<td style="padding:12px 16px;text-align:right;color:#aaa;font-size:15px;">{int(LGD_p4*100)}%</td>'
+        f'<td style="padding:12px 16px;text-align:right;color:#fff;font-weight:700;font-size:15px;">${base_total_el} Mn</td>'
         f'</tr>')
     st.markdown(el_hdr + el_body + "</tbody></table></div>", unsafe_allow_html=True)
 
@@ -944,12 +952,12 @@ with tab4:
         '<div style="overflow-x:auto;margin-bottom:16px;">'
         '<table style="width:100%;border-collapse:collapse;">'
         '<thead><tr style="background:#1a1f2e;">'
-        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Segment</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Base DR</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Stressed DR</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Base EL</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Stressed EL</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Additional Loss</th>'
+        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Segment</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Base DR</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Stressed DR</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Base EL</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Stressed EL</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Additional Loss</th>'
         '</tr></thead><tbody>'
     )
     s_body = ""
@@ -957,12 +965,12 @@ with tab4:
         cc = "#E63946" if sr["el_change"]>0 else "#00B4D8"
         s_body += (
             f'<tr style="background:#0e1117;border-bottom:1px solid #1a1f2e;">'
-            f'<td style="padding:12px 16px;color:{seg_colors[sr["seg"]]};font-weight:700;font-size:14px;">{sr["seg"]}</td>'
-            f'<td style="padding:12px 16px;text-align:right;color:#ccc;font-size:14px;">{sr["base_dr"]}%</td>'
-            f'<td style="padding:12px 16px;text-align:right;color:#FFB703;font-size:14px;">{sr["stressed_dr"]}%</td>'
-            f'<td style="padding:12px 16px;text-align:right;color:#ccc;font-size:14px;">${sr["base_el"]} Mn</td>'
-            f'<td style="padding:12px 16px;text-align:right;color:#FFB703;font-size:14px;">${sr["stressed_el"]} Mn</td>'
-            f'<td style="padding:12px 16px;text-align:right;color:{cc};font-weight:700;font-size:14px;">+${sr["el_change"]} Mn</td>'
+            f'<td style="padding:12px 16px;color:{seg_colors[sr["seg"]]};font-weight:700;font-size:15px;">{sr["seg"]}</td>'
+            f'<td style="padding:12px 16px;text-align:right;color:#ccc;font-size:15px;">{sr["base_dr"]}%</td>'
+            f'<td style="padding:12px 16px;text-align:right;color:#FFB703;font-size:15px;">{sr["stressed_dr"]}%</td>'
+            f'<td style="padding:12px 16px;text-align:right;color:#ccc;font-size:15px;">${sr["base_el"]} Mn</td>'
+            f'<td style="padding:12px 16px;text-align:right;color:#FFB703;font-size:15px;">${sr["stressed_el"]} Mn</td>'
+            f'<td style="padding:12px 16px;text-align:right;color:{cc};font-weight:700;font-size:15px;">+${sr["el_change"]} Mn</td>'
             f'</tr>')
     st.markdown(s_hdr + s_body + "</tbody></table></div>", unsafe_allow_html=True)
 
@@ -982,12 +990,12 @@ with tab4:
             color_discrete_map={"Base Case":"#00B4D8", scenario:"#E63946"},
             category_orders={"Segment":ORDER})
         fig1.update_traces(texttemplate="$%{text} Mn", textposition="outside",
-            textfont=dict(size=12), cliponaxis=False)
+            textfont=dict(size=13), cliponaxis=False)
         fig1.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
             font_family="Inter",
-            yaxis=dict(gridcolor="#1f2630", range=[0,el_df["Expected Loss ($ Mn)"].max()*1.35], tickfont_size=12),
-            xaxis=dict(tickfont_size=13), bargap=0.2, bargroupgap=0.05,
-            legend=dict(orientation="h",yanchor="bottom",y=1.02,xanchor="right",x=1,font_size=12),
+            yaxis=dict(gridcolor="#1f2630", range=[0,el_df["Expected Loss ($ Mn)"].max()*1.35], tickfont_size=13),
+            xaxis=dict(tickfont_size=14), bargap=0.2, bargroupgap=0.05,
+            legend=dict(orientation="h",yanchor="bottom",y=1.02,xanchor="right",x=1,font_size=13),
             margin=dict(t=50,b=20,l=20,r=20), height=380)
         st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
     with col2:
@@ -1001,12 +1009,12 @@ with tab4:
             color_discrete_map={"Base Case":"#00B4D8", scenario:"#E63946"},
             category_orders={"Segment":ORDER})
         fig2.update_traces(texttemplate="%{text}%", textposition="outside",
-            textfont=dict(size=12), cliponaxis=False)
+            textfont=dict(size=13), cliponaxis=False)
         fig2.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
             font_family="Inter",
-            yaxis=dict(gridcolor="#1f2630", range=[0,dr_df["Default Rate (%)"].max()*1.35], tickfont_size=12),
-            xaxis=dict(tickfont_size=13), bargap=0.2, bargroupgap=0.05,
-            legend=dict(orientation="h",yanchor="bottom",y=1.02,xanchor="right",x=1,font_size=12),
+            yaxis=dict(gridcolor="#1f2630", range=[0,dr_df["Default Rate (%)"].max()*1.35], tickfont_size=13),
+            xaxis=dict(tickfont_size=14), bargap=0.2, bargroupgap=0.05,
+            legend=dict(orientation="h",yanchor="bottom",y=1.02,xanchor="right",x=1,font_size=13),
             margin=dict(t=50,b=20,l=20,r=20), height=380)
         st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
@@ -1068,7 +1076,7 @@ with tab4:
         delta=f"{round(new_port_el-base_port_el,2)}", delta_color="inverse")
 
     st.markdown(
-        f"<p style='color:#aaaaaa;font-size:13px !important;margin:10px 0 16px 0;'>"
+        f"<p style='color:#aaaaaa;font-size:14px !important;margin:10px 0 16px 0;'>"
         f"Reallocation sourced proportionally — "
         f"<b style='color:#FB8500'>{round(sub_weight*100,1)}% from SUBPRIME</b> and "
         f"<b style='color:#E63946'>{round(high_weight*100,1)}% from HIGH-RISK</b>.</p>",
@@ -1089,12 +1097,12 @@ with tab4:
         color_discrete_map={"Current":"#FFB703","Simulated":"#00B4D8"},
         category_orders={"Segment":ORDER})
     fig_sim.update_traces(texttemplate="$%{text} Mn", textposition="outside",
-        textfont=dict(size=13), cliponaxis=False)
+        textfont=dict(size=14), cliponaxis=False)
     fig_sim.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
         font_family="Inter", yaxis_title="Exposure ($ Mn)",
-        yaxis=dict(gridcolor="#1f2630", range=[0, realloc_data["Exposure ($ Mn)"].max()*1.3], tickfont_size=12),
-        xaxis=dict(tickfont_size=14), bargap=0.2, bargroupgap=0.05,
-        legend=dict(orientation="h",yanchor="bottom",y=1.02,xanchor="right",x=1,font_size=13),
+        yaxis=dict(gridcolor="#1f2630", range=[0, realloc_data["Exposure ($ Mn)"].max()*1.3], tickfont_size=13),
+        xaxis=dict(tickfont_size=15), bargap=0.2, bargroupgap=0.05,
+        legend=dict(orientation="h",yanchor="bottom",y=1.02,xanchor="right",x=1,font_size=14),
         margin=dict(t=50,b=20,l=20,r=20), height=380)
     st.plotly_chart(fig_sim, use_container_width=True, config=CHART_CONFIG)
 
@@ -1179,7 +1187,7 @@ with tab5:
 
     fhtml = '<div style="background:#1a1f2e;border-radius:10px;padding:24px 28px;border:1px solid #2d3447;">'
     for f in findings:
-        fhtml += f'<p style="color:#cccccc;font-size:15px !important;margin-bottom:14px;line-height:1.7;">→ {f}</p>'
+        fhtml += f'<p style="color:#cccccc;font-size:16px !important;margin-bottom:14px;line-height:1.75;">→ {f}</p>'
     fhtml += '</div>'
     st.markdown(fhtml, unsafe_allow_html=True)
 
@@ -1208,22 +1216,22 @@ with tab5:
     a_hdr = (
         '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;">'
         '<thead><tr style="background:#1a1f2e;">'
-        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Segment</th>'
-        '<th style="padding:12px 16px;text-align:center;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Action</th>'
-        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">What to Do</th>'
-        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:11px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Why</th>'
+        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Segment</th>'
+        '<th style="padding:12px 16px;text-align:center;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Action</th>'
+        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">What to Do</th>'
+        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Why</th>'
         '</tr></thead><tbody>'
     )
     a_body = ""
-    badge = "padding:4px 14px;border-radius:20px;font-weight:700;font-size:12px;"
+    badge = "padding:4px 14px;border-radius:20px;font-weight:700;font-size:13px;"
     for seg, rec, color, what, why in actions:
         a_body += (
             f'<tr style="background:#0e1117;border-bottom:1px solid #1a1f2e;">'
-            f'<td style="padding:12px 16px;color:white;font-weight:700;font-size:14px;">{seg}</td>'
+            f'<td style="padding:12px 16px;color:white;font-weight:700;font-size:15px;">{seg}</td>'
             f'<td style="padding:12px 16px;text-align:center;">'
             f'<span style="background:{color}22;color:{color};border:1px solid {color};{badge}">{rec}</span></td>'
-            f'<td style="padding:12px 16px;color:#ccc;font-size:14px;">{what}</td>'
-            f'<td style="padding:12px 16px;color:#aaa;font-size:13px;">{why}</td>'
+            f'<td style="padding:12px 16px;color:#ccc;font-size:15px;">{what}</td>'
+            f'<td style="padding:12px 16px;color:#aaa;font-size:14px;">{why}</td>'
             f'</tr>')
     st.markdown(a_hdr + a_body + "</tbody></table></div>", unsafe_allow_html=True)
 
@@ -1242,12 +1250,12 @@ with tab5:
         color_discrete_map={"Current %":"#FFB703","Target %":"#00B4D8"},
         category_orders={"Segment":ORDER})
     fig_fin.update_traces(texttemplate="%{x}%", textposition="outside",
-        textfont=dict(size=14), cliponaxis=False)
+        textfont=dict(size=15), cliponaxis=False)
     fig_fin.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
         font_family="Inter", xaxis_title="Allocation (%)",
-        xaxis=dict(gridcolor="#1f2630", range=[0,max_val*1.3], tickfont_size=12),
-        yaxis=dict(tickfont_size=14), bargap=0.2, bargroupgap=0.1,
-        legend=dict(orientation="h",yanchor="bottom",y=1.02,xanchor="right",x=1,font_size=13),
+        xaxis=dict(gridcolor="#1f2630", range=[0,max_val*1.3], tickfont_size=13),
+        yaxis=dict(tickfont_size=15), bargap=0.2, bargroupgap=0.1,
+        legend=dict(orientation="h",yanchor="bottom",y=1.02,xanchor="right",x=1,font_size=14),
         margin=dict(t=50,b=20,l=20,r=100), height=300)
     st.plotly_chart(fig_fin, use_container_width=True, config=CHART_CONFIG)
 
