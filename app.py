@@ -92,10 +92,10 @@ st.markdown("""
         justify-content: stretch !important;
     }
 
-    /* ── TAB STYLES — KEEP AT 22px ── */
+    /* ── TAB STYLES — BUMPED TO 26px ── */
     [data-baseweb="tab"] {
         font-family: 'Inter', sans-serif !important;
-        font-size: 22px !important;
+        font-size: 26px !important;
         font-weight: 600 !important;
         color: #cccccc !important;
         padding: 20px 0 !important;
@@ -378,7 +378,7 @@ function initScrollEffect() {
             tabs.forEach(t => { t.style.fontSize='16px'; t.style.padding='11px 0'; });
             tabList.style.boxShadow = '0 4px 20px rgba(0,0,0,0.6)';
         } else {
-            tabs.forEach(t => { t.style.fontSize='22px'; t.style.padding='20px 0'; });
+            tabs.forEach(t => { t.style.fontSize='26px'; t.style.padding='20px 0'; });
             tabList.style.boxShadow = 'none';
         }
     });
