@@ -44,8 +44,14 @@ st.markdown("""
         max-width: 1440px !important;
         margin-top: 0 !important;
     }
-    [data-testid="stMainBlockContainer"] {
+    [data-testid="stMainBlockContainer"],
+    [data-testid="stAppViewBlockContainer"] {
         padding-top: 52px !important;
+        margin-top: 0 !important;
+    }
+    section.main > div:first-child {
+        padding-top: 0 !important;
+        margin-top: 0 !important;
     }
     /* ── KILL GAP BETWEEN HEADER AND KPI CARDS ── */
     [data-testid="stTabs"] {
@@ -84,7 +90,7 @@ st.markdown("""
     /* ── TAB STYLES ── */
     [data-baseweb="tab"] {
         font-family: 'Inter', sans-serif !important;
-        font-size: 17px !important;
+        font-size: 19px !important;
         font-weight: 500 !important;
         color: #cccccc !important;
         padding: 16px 0 !important;
@@ -268,6 +274,9 @@ st.markdown("""
             font-size: 11px !important;
             padding: 12px 0 !important;
         }
+        @media (max-width: 900px) and (orientation: landscape) {
+        [data-baseweb="tab"] { font-size: 12px !important; padding: 11px 0 !important; }
+        }
         .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
         .col-divider-wrap { display: none !important; }
     }
@@ -301,9 +310,8 @@ initScrollEffect();
 # ── Fixed footer ──
 st.markdown("""
 <div class="footer-bar">
-    <span class="footer-left">Credit Risk Intelligence Platform</span>
-    <span class="footer-right">
-        Built by <span class="footer-name">Meghna</span>
+    <span class="footer-left">
+        Credit Risk Intelligence Platform &nbsp;·&nbsp; Built by <span class="footer-name">Meghna</span>
     </span>
 </div>
 """, unsafe_allow_html=True)
