@@ -39,20 +39,24 @@ st.markdown("""
     [data-testid="collapsedControl"] { display: none !important; }
 
     /* ── MAIN CONTAINER ── */
-    .main .block-container {
-        padding: 0px 2rem 6rem 2rem !important;
-        max-width: 1440px !important;
-        margin-top: 0 !important;
-    }
-    [data-testid="stMainBlockContainer"],
-    [data-testid="stAppViewBlockContainer"] {
-        padding-top: 52px !important;
-        margin-top: 0 !important;
-    }
-    section.main > div:first-child {
-        padding-top: 0 !important;
-        margin-top: 0 !important;
-    }
+.main .block-container,
+[data-testid="stMainBlockContainer"],
+[data-testid="stAppViewBlockContainer"],
+section[data-testid="stMain"] > div,
+section.main > div {
+    padding-top: 0 !important;
+    margin-top: 0 !important;
+    max-width: 1440px !important;
+}
+.main .block-container {
+    padding: 0 2rem 6rem 2rem !important;
+}
+.platform-header {
+    margin-top: 60px !important;
+    padding: 12px 0 10px 0 !important;
+    border-bottom: 1px solid #2d3447 !important;
+    margin-bottom: 10px !important;
+}    
     /* ── KILL GAP BETWEEN HEADER AND KPI CARDS ── */
     [data-testid="stTabs"] {
         margin-top: 0 !important;
@@ -90,10 +94,10 @@ st.markdown("""
     /* ── TAB STYLES ── */
     [data-baseweb="tab"] {
         font-family: 'Inter', sans-serif !important;
-        font-size: 19px !important;
-        font-weight: 500 !important;
+        font-size: 22px !important;
+        font-weight: 600 !important;
         color: #cccccc !important;
-        padding: 16px 0 !important;
+        padding: 20px 0 !important;
         border-bottom: 3px solid transparent !important;
         border-right: 1px solid #2d3447 !important;
         background: transparent !important;
@@ -219,12 +223,12 @@ st.markdown("""
     }
 
     /* ── PLATFORM HEADER ── */
-    .platform-header {
-        padding: 12px 0 10px 0;
-        border-bottom: 1px solid #2d3447;
-        margin-bottom: 10px !important;
-    }
-
+.platform-header {
+    padding: 0 0 8px 0 !important;
+    border-bottom: 1px solid #2d3447;
+    margin-top: 25px !important;
+    margin-bottom: 6px !important;
+}
     /* ── FIXED FOOTER ── */
     .footer-bar {
         position: fixed; bottom: 0; left: 0; right: 0;
@@ -274,12 +278,15 @@ st.markdown("""
             font-size: 11px !important;
             padding: 12px 0 !important;
         }
-        @media (max-width: 900px) and (orientation: landscape) {
-        [data-baseweb="tab"] { font-size: 12px !important; padding: 11px 0 !important; }
+        @media (max-width: 950px) and (orientation: landscape) {
+        [data-baseweb="tab"] { font-size: 12px !important; padding: 10px 0 !important; }
         }
-        .kpi-grid { grid-template-columns: repeat(2, 1fr) !important; }
-        .col-divider-wrap { display: none !important; }
+
+        .platform-header {
+        margin-top: -120px !important;
     }
+}
+
     </style>
 """, unsafe_allow_html=True)
 
@@ -295,10 +302,10 @@ function initScrollEffect() {
     main.addEventListener('scroll', function() {
         const tabs = doc.querySelectorAll('[data-baseweb="tab"]');
         if (main.scrollTop > 60) {
-            tabs.forEach(t => { t.style.fontSize='13px'; t.style.padding='10px 0'; });
+            tabs.forEach(t => { t.style.fontSize='22px'; t.style.padding='20px 0'; });
             tabList.style.boxShadow = '0 4px 20px rgba(0,0,0,0.6)';
         } else {
-            tabs.forEach(t => { t.style.fontSize='17px'; t.style.padding='16px 0'; });
+            tabs.forEach(t => { t.style.fontSize='22px'; t.style.padding='18px 0'; });
             tabList.style.boxShadow = 'none';
         }
     });
