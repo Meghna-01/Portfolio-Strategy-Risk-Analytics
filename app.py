@@ -258,6 +258,27 @@ st.markdown("""
 
     /* ── COL DIVIDER ── */
     .col-divider-wrap { display: block; }
+    /* ── STREAMLIT CLOUD SCALING FIX ── */
+    html {
+        -webkit-text-size-adjust: 100% !important;
+        text-size-adjust: 100% !important;
+    }
+
+    .main .block-container,
+    [data-testid="stMainBlockContainer"],
+    [data-testid="stAppViewBlockContainer"] {
+        max-width: 100% !important;
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+    }
+
+    @media (max-width: 1024px) and (orientation: landscape) {
+        [data-baseweb="tab"] { font-size: 16px !important; }
+        .kpi-value,
+        [data-testid="stMarkdownContainer"] p.kpi-value {
+            font-size: 18px !important;
+        }
+    }
 
     /* ── MOBILE PORTRAIT ── */
     @media (max-width: 768px) and (orientation: portrait) {
@@ -350,24 +371,7 @@ st.markdown("""
             padding: 14px 8px !important;
         }
     }
-/* ── FORCE FULL WIDTH ON STREAMLIT CLOUD ── */
-.stApp {
-    max-width: 100% !important;
-}
 
-.stMainBlockContainer,
-.stAppViewBlockContainer {
-    max-width: 1440px !important;
-    margin-left: auto !important;
-    margin-right: auto !important;
-    padding-left: 2rem !important;
-    padding-right: 2rem !important;
-}
-
-/* Hide Streamlit Cloud's "Manage app" button so it doesn't overlap footer */
-[data-testid="stToolbar"] {
-    display: none !important;
-}
     </style>
 """, unsafe_allow_html=True)
 
