@@ -52,7 +52,7 @@ st.markdown("""
     section.main > div {
         padding-top: 0 !important;
         margin-top: 0 !important;
-        max-width: 100% !important;
+        max-width: 1440px !important;
     }
     .main .block-container {
         padding: 0 2rem 6rem 2rem !important;
@@ -181,7 +181,7 @@ st.markdown("""
         line-height: 1.4 !important;
     }
     .kpi-value {
-        font-size: 21px !important;
+        font-size: 24px !important;
         font-weight: 800 !important;
         color: #00B4D8 !important;
         margin: 0 !important;
@@ -191,7 +191,7 @@ st.markdown("""
     }
     [data-testid="stMarkdownContainer"] p.kpi-value {
         color: #00B4D8 !important;
-        font-size: 21px !important;
+        font-size: 24px !important;
         font-weight: 800 !important;
     }
     .kpi-sub {
