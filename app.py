@@ -286,7 +286,59 @@ section.main > div {
         margin-top: -120px !important;
     }
 }
+/* ── PHONE PORTRAIT: keep KPI cards normal, allow horizontal swipe ── */
+@media (max-width: 768px) and (orientation: portrait) {
 
+    .kpi-grid {
+        display: flex !important;
+        grid-template-columns: none !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        gap: 14px !important;
+        padding-bottom: 10px !important;
+        scroll-snap-type: x mandatory !important;
+        -webkit-overflow-scrolling: touch !important;
+    }
+
+    .kpi-card {
+        min-width: 240px !important;
+        max-width: 240px !important;
+        flex: 0 0 240px !important;
+        scroll-snap-align: start !important;
+        padding: 20px 16px !important;
+    }
+
+    .kpi-label,
+    .kpi-value,
+    .kpi-sub,
+    [data-testid="stMarkdownContainer"] p.kpi-label,
+    [data-testid="stMarkdownContainer"] p.kpi-value,
+    [data-testid="stMarkdownContainer"] p.kpi-sub {
+        white-space: normal !important;
+        word-break: normal !important;
+        overflow-wrap: normal !important;
+        text-align: center !important;
+    }
+
+    .kpi-label,
+    [data-testid="stMarkdownContainer"] p.kpi-label {
+        font-size: 12px !important;
+        line-height: 1.4 !important;
+    }
+
+    .kpi-value,
+    [data-testid="stMarkdownContainer"] p.kpi-value {
+        font-size: 28px !important;
+        line-height: 1.1 !important;
+        color: #00B4D8 !important;
+    }
+
+    .kpi-sub,
+    [data-testid="stMarkdownContainer"] p.kpi-sub {
+        font-size: 14px !important;
+        line-height: 1.5 !important;
+    }
+}
     </style>
 """, unsafe_allow_html=True)
 
