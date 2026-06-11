@@ -16,6 +16,12 @@ if "lgd_value" not in st.session_state:
 
 st.markdown("""
     <style>
+    /* ── STREAMLIT CLOUD SCALING FIX ── */
+    html {
+        -webkit-text-size-adjust: 100% !important;
+        text-size-adjust: 100% !important;
+    }
+
     @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
     html, body, [class*="css"], p, span, div, td, th, li {
@@ -46,7 +52,7 @@ st.markdown("""
     section.main > div {
         padding-top: 0 !important;
         margin-top: 0 !important;
-        max-width: 1440px !important;
+        max-width: 100% !important;
     }
     .main .block-container {
         padding: 0 2rem 6rem 2rem !important;
@@ -86,7 +92,7 @@ st.markdown("""
         justify-content: stretch !important;
     }
 
-    /* ── TAB STYLES — KEEP AT 22px, DO NOT REDUCE ── */
+    /* ── TAB STYLES — KEEP AT 22px ── */
     [data-baseweb="tab"] {
         font-family: 'Inter', sans-serif !important;
         font-size: 22px !important;
@@ -116,23 +122,23 @@ st.markdown("""
         font-weight: 600 !important;
     }
 
-    /* ── TYPOGRAPHY — one size smaller throughout ── */
-    h1 { font-size: 32px !important; font-weight: 800 !important; color: #ffffff !important;
+    /* ── TYPOGRAPHY ── */
+    h1 { font-size: 30px !important; font-weight: 800 !important; color: #ffffff !important;
          letter-spacing: -0.5px !important; line-height: 1.2 !important; margin-bottom: 6px !important; }
-    h2 { font-size: 24px !important; font-weight: 700 !important; color: #ffffff !important; }
-    h3 { font-size: 19.5px !important; font-weight: 600 !important; color: #ffffff !important; }
+    h2 { font-size: 22px !important; font-weight: 700 !important; color: #ffffff !important; }
+    h3 { font-size: 18px !important; font-weight: 600 !important; color: #ffffff !important; }
 
     p, li,
     [data-testid="stMarkdownContainer"] p,
     [data-testid="stMarkdownContainer"] li {
-        font-size: 15px !important;
+        font-size: 14px !important;
         line-height: 1.75 !important;
         color: #cccccc !important;
     }
     .stCaption,
     [data-testid="stCaptionContainer"] p,
     [data-testid="stCaptionContainer"] {
-        font-size: 14px !important;
+        font-size: 13px !important;
         color: #aaaaaa !important;
     }
 
@@ -205,7 +211,7 @@ st.markdown("""
         margin-bottom: 24px;
     }
     .insight-box p {
-        font-size: 15px !important; color: #e0e0e0 !important;
+        font-size: 14px !important; color: #e0e0e0 !important;
         margin: 0 !important; line-height: 1.75 !important;
     }
 
@@ -258,27 +264,6 @@ st.markdown("""
 
     /* ── COL DIVIDER ── */
     .col-divider-wrap { display: block; }
-    /* ── STREAMLIT CLOUD SCALING FIX ── */
-    html {
-        -webkit-text-size-adjust: 100% !important;
-        text-size-adjust: 100% !important;
-    }
-
-    .main .block-container,
-    [data-testid="stMainBlockContainer"],
-    [data-testid="stAppViewBlockContainer"] {
-        max-width: 100% !important;
-        padding-left: 1.5rem !important;
-        padding-right: 1.5rem !important;
-    }
-
-    @media (max-width: 1024px) and (orientation: landscape) {
-        [data-baseweb="tab"] { font-size: 16px !important; }
-        .kpi-value,
-        [data-testid="stMarkdownContainer"] p.kpi-value {
-            font-size: 18px !important;
-        }
-    }
 
     /* ── MOBILE PORTRAIT ── */
     @media (max-width: 768px) and (orientation: portrait) {
@@ -286,18 +271,14 @@ st.markdown("""
         .main .block-container {
             padding: 0 0.8rem 6rem 0.8rem !important;
         }
-
         [data-baseweb="tab"] {
             font-size: 11px !important;
             padding: 12px 0 !important;
         }
-
-        /* FIX: title not cut behind tab bar on portrait */
         .platform-header {
             margin-top: 55px !important;
             padding-top: 8px !important;
         }
-
         .kpi-grid {
             display: flex !important;
             grid-template-columns: none !important;
@@ -308,7 +289,6 @@ st.markdown("""
             scroll-snap-type: x mandatory !important;
             -webkit-overflow-scrolling: touch !important;
         }
-
         .kpi-card {
             min-width: 220px !important;
             max-width: 220px !important;
@@ -316,7 +296,6 @@ st.markdown("""
             scroll-snap-align: start !important;
             padding: 20px 16px !important;
         }
-
         .kpi-label,
         .kpi-value,
         .kpi-sub,
@@ -328,45 +307,37 @@ st.markdown("""
             overflow-wrap: normal !important;
             text-align: center !important;
         }
-
         .kpi-value,
         [data-testid="stMarkdownContainer"] p.kpi-value {
             font-size: 26px !important;
             color: #00B4D8 !important;
         }
-
         .col-divider-wrap { display: none !important; }
     }
 
-    /* ── LANDSCAPE PHONE — FIX $312.3 Mn truncation ── */
+    /* ── LANDSCAPE PHONE ── */
     @media (max-width: 950px) and (orientation: landscape) {
-
         [data-baseweb="tab"] {
             font-size: 12px !important;
             padding: 10px 0 !important;
         }
-
         .platform-header {
             margin-top: 40px !important;
         }
-
         .kpi-value,
         [data-testid="stMarkdownContainer"] p.kpi-value {
             font-size: 16px !important;
             color: #00B4D8 !important;
             white-space: nowrap !important;
         }
-
         .kpi-label,
         [data-testid="stMarkdownContainer"] p.kpi-label {
             font-size: 10px !important;
         }
-
         .kpi-sub,
         [data-testid="stMarkdownContainer"] p.kpi-sub {
             font-size: 10px !important;
         }
-
         .kpi-card {
             padding: 14px 8px !important;
         }
@@ -1020,7 +991,6 @@ with tab4:
         "Full computation chain — Exposure × Default Rate × LGD = Expected Loss.</p>",
         unsafe_allow_html=True)
 
-    # ── Base EL table ──
     el_hdr = (
         '<div style="overflow-x:auto;margin-bottom:16px;">'
         '<table style="width:100%;border-collapse:collapse;">'
@@ -1054,7 +1024,6 @@ with tab4:
         f'</tr>')
     st.markdown(el_hdr + el_body + "</tbody></table></div>", unsafe_allow_html=True)
 
-    # ── Stress comparison table ──
     s_hdr = (
         '<div style="overflow-x:auto;margin-bottom:16px;">'
         '<table style="width:100%;border-collapse:collapse;">'
