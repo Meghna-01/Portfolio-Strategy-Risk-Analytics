@@ -22,73 +22,94 @@ st.markdown("""
         font-family: 'Inter', sans-serif !important;
     }
 
-    /* Kill top empty space */
+    /* ── KILL ALL TOP SPACE ── */
+    html, body {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
     header[data-testid="stHeader"] {
+        display: none !important;
         height: 0 !important;
         min-height: 0 !important;
+        max-height: 0 !important;
         padding: 0 !important;
+        margin: 0 !important;
+        overflow: hidden !important;
+    }
+    #root > div:first-child {
+        margin-top: 0 !important;
+        padding-top: 0 !important;
+    }
+    .main > div:first-child {
+        padding-top: 0 !important;
+        margin-top: 0 !important;
     }
 
     /* Hide sidebar */
     [data-testid="stSidebar"]        { display: none !important; }
     [data-testid="collapsedControl"] { display: none !important; }
 
-    /* Main container */
+    /* ── MAIN CONTAINER — tight horizontal padding ── */
     .main .block-container {
-        padding: 0 2rem 6rem 2rem !important;
+        padding: 0 1rem 6rem 1rem !important;
         padding-top: 0 !important;
         max-width: 1440px !important;
+        margin-top: 0 !important;
     }
 
-    /* ── STICKY TAB BAR ── */
+    /* ── TRULY STICKY TAB BAR ── */
     [data-testid="stTabs"] {
         position: relative !important;
     }
-    [data-testid="stTabs"] > div:first-child {
-        position: sticky !important;
-        top: 0 !important;
-        z-index: 999 !important;
-        background: #0E1117 !important;
-    }
+
     [data-testid="stTabs"] [data-baseweb="tab-list"] {
-        position: sticky !important;
+        position: fixed !important;
         top: 0 !important;
-        z-index: 999 !important;
-        background: rgba(14,17,23,0.97) !important;
+        left: 0 !important;
+        right: 0 !important;
+        z-index: 9999 !important;
+        background: rgba(14,17,23,0.98) !important;
         backdrop-filter: blur(12px) !important;
         -webkit-backdrop-filter: blur(12px) !important;
         border-bottom: 1px solid #2d3447 !important;
-        padding: 0 !important;
+        padding: 0 1rem !important;
         gap: 0 !important;
         margin-bottom: 0 !important;
+        display: flex !important;
+        width: 100% !important;
+        box-sizing: border-box !important;
     }
 
+    /* Push tab content down so it doesn't hide under fixed bar */
+    [data-baseweb="tab-panel"] {
+        padding-top: 64px !important;
+    }
+
+    /* ── TAB STYLES ── */
     [data-baseweb="tab"] {
         font-family: 'Inter', sans-serif !important;
         font-size: 15px !important;
         font-weight: 500 !important;
         color: #aaaaaa !important;
-        padding: 18px 28px !important;
+        padding: 18px 24px !important;
         border-bottom: 2px solid transparent !important;
+        border-right: 1px solid #2d3447 !important;
         background: transparent !important;
         transition: all 0.2s ease !important;
         white-space: nowrap !important;
     }
-
+    [data-baseweb="tab"]:last-child {
+        border-right: none !important;
+    }
     [data-baseweb="tab"]:hover {
         color: #ffffff !important;
-        background: rgba(255,255,255,0.04) !important;
+        background: transparent !important;
     }
-
     [aria-selected="true"][data-baseweb="tab"] {
         color: #00B4D8 !important;
         border-bottom: 2px solid #00B4D8 !important;
         background: transparent !important;
         font-weight: 600 !important;
-    }
-
-    [data-baseweb="tab-panel"] {
-        padding-top: 32px !important;
     }
 
     /* ── TYPOGRAPHY ── */
@@ -140,7 +161,7 @@ st.markdown("""
         font-size: 14px !important;
     }
 
-    /* ── KPI CARDS ── */
+    /* ── KPI CARDS — centre aligned ── */
     .kpi-grid {
         display: grid;
         grid-template-columns: repeat(5, 1fr);
@@ -151,8 +172,9 @@ st.markdown("""
         background: #1a1f2e;
         border: 1px solid #2d3447;
         border-radius: 12px;
-        padding: 24px 20px;
+        padding: 24px 16px;
         transition: border-color 0.2s ease;
+        text-align: center;
     }
     .kpi-card:hover { border-color: #00B4D8; }
     .kpi-label {
@@ -162,6 +184,7 @@ st.markdown("""
         text-transform: uppercase !important;
         letter-spacing: 0.8px !important;
         margin: 0 0 10px 0 !important;
+        text-align: center !important;
     }
     .kpi-value {
         font-size: 28px !important;
@@ -170,11 +193,13 @@ st.markdown("""
         margin: 0 !important;
         letter-spacing: -0.5px !important;
         line-height: 1 !important;
+        text-align: center !important;
     }
     .kpi-sub {
         font-size: 12px !important;
         color: #999999 !important;
         margin: 6px 0 0 0 !important;
+        text-align: center !important;
     }
 
     /* ── INSIGHT BOX ── */
@@ -206,14 +231,6 @@ st.markdown("""
         border-bottom: 1px solid #2d3447;
         margin-bottom: 0;
     }
-    .platform-title {
-        font-size: 13px !important;
-        font-weight: 700 !important;
-        color: #00B4D8 !important;
-        text-transform: uppercase !important;
-        letter-spacing: 2px !important;
-        margin: 0 0 8px 0 !important;
-    }
 
     /* ── FIXED FOOTER ── */
     .footer-bar {
@@ -232,17 +249,59 @@ st.markdown("""
         backdrop-filter: blur(8px);
     }
 
-    /* ── SLIDER ── */
-    [data-testid="stSlider"] > div > div > div {
+    /* ── SLIDER — full redesign ── */
+    [data-testid="stSlider"] {
+        padding: 8px 0 !important;
+    }
+    [data-testid="stSlider"] > div {
+        padding: 4px 0 !important;
+    }
+    /* Track container */
+    [data-testid="stSlider"] [data-baseweb="slider"] {
+        padding: 10px 0 !important;
+    }
+    /* Full track background */
+    [data-testid="stSlider"] [data-baseweb="slider"] > div > div:first-child {
+        height: 6px !important;
+        border-radius: 4px !important;
         background: #2d3447 !important;
     }
-    [data-testid="stSlider"] > div > div > div > div {
+    /* Filled portion of track */
+    [data-testid="stSlider"] [data-baseweb="slider"] [role="progressbar"] {
+        height: 6px !important;
         background: #00B4D8 !important;
+        border-radius: 4px !important;
     }
+    /* Thumb */
+    [data-testid="stSlider"] [role="slider"] {
+        width: 22px !important;
+        height: 22px !important;
+        border-radius: 50% !important;
+        background: #00B4D8 !important;
+        border: 3px solid #ffffff !important;
+        box-shadow: 0 0 0 3px rgba(0,180,216,0.3) !important;
+        top: 50% !important;
+        transform: translateY(-50%) !important;
+        cursor: grab !important;
+    }
+    [data-testid="stSlider"] [role="slider"]:active {
+        cursor: grabbing !important;
+        box-shadow: 0 0 0 5px rgba(0,180,216,0.4) !important;
+    }
+    /* Thumb value label */
     [data-testid="stSlider"] [data-testid="stThumbValue"] {
         color: #ffffff !important;
         font-size: 14px !important;
-        font-weight: 600 !important;
+        font-weight: 700 !important;
+        background: #1a1f2e !important;
+        border: 1px solid #2d3447 !important;
+        border-radius: 6px !important;
+        padding: 2px 8px !important;
+    }
+    /* Min/max tick labels */
+    [data-testid="stSlider"] [data-testid="stTickBar"] {
+        color: #aaaaaa !important;
+        font-size: 12px !important;
     }
 
     /* ── SELECTBOX ── */
@@ -253,36 +312,45 @@ st.markdown("""
         font-size: 15px !important;
     }
 
+    /* ── COL DIVIDER — hide on mobile ── */
+    .col-divider-wrap {
+        display: block;
+    }
+
     /* ── MOBILE 768px ── */
     @media (max-width: 768px) {
         .main .block-container {
-            padding: 0 1rem 6rem 1rem !important;
+            padding: 0 0.5rem 6rem 0.5rem !important;
         }
         [data-baseweb="tab"] {
-            font-size: 12px !important;
-            padding: 14px 10px !important;
+            font-size: 11px !important;
+            padding: 14px 8px !important;
         }
-        h1 { font-size: 26px !important; }
-        h2 { font-size: 22px !important; }
-        h3 { font-size: 18px !important; }
-        p  { font-size: 16px !important; }
+        h1 { font-size: 24px !important; }
+        h2 { font-size: 20px !important; }
+        h3 { font-size: 17px !important; }
+        p  { font-size: 15px !important; }
         .kpi-grid {
             grid-template-columns: repeat(2, 1fr) !important;
         }
         [data-testid="stMetricValue"] {
             font-size: 26px !important;
         }
-        .kpi-value { font-size: 24px !important; }
+        .kpi-value { font-size: 22px !important; }
         .footer-bar {
             flex-direction: column;
             height: auto;
             padding: 8px 16px;
             gap: 2px;
         }
+        /* Stack columns and hide divider on mobile */
         [data-testid="column"] {
             width: 100% !important;
             flex: 100% !important;
             min-width: 100% !important;
+        }
+        .col-divider-wrap {
+            display: none !important;
         }
         .js-plotly-plot, .plotly {
             width: 100% !important;
@@ -297,17 +365,14 @@ st.markdown("""
     /* ── MOBILE 480px ── */
     @media (max-width: 480px) {
         [data-baseweb="tab"] {
-            font-size: 10px !important;
-            padding: 10px 6px !important;
+            font-size: 9px !important;
+            padding: 10px 5px !important;
         }
         .kpi-grid {
             grid-template-columns: 1fr !important;
         }
-        .main .block-container {
-            padding: 0 0.5rem 6rem 0.5rem !important;
-        }
-        h1 { font-size: 22px !important; }
-        p  { font-size: 15px !important; }
+        h1 { font-size: 20px !important; }
+        p  { font-size: 14px !important; }
     }
     </style>
 """, unsafe_allow_html=True)
@@ -326,13 +391,13 @@ function initScrollEffect() {
         if (main.scrollTop > 80) {
             tabs.forEach(t => {
                 t.style.fontSize = '13px';
-                t.style.padding  = '12px 18px';
+                t.style.padding  = '12px 14px';
             });
             tabList.style.boxShadow = '0 4px 20px rgba(0,0,0,0.6)';
         } else {
             tabs.forEach(t => {
                 t.style.fontSize = '15px';
-                t.style.padding  = '18px 28px';
+                t.style.padding  = '18px 24px';
             });
             tabList.style.boxShadow = 'none';
         }
@@ -354,10 +419,9 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ── Platform header ──
+# ── Platform header — NO cyan label ──
 st.markdown("""
 <div class="platform-header">
-    <p class="platform-title">Credit Risk Intelligence Platform</p>
     <h1 style="margin:0; font-size:32px !important;">Portfolio Strategy & Risk Analytics</h1>
     <p style="font-size:15px !important; color:#aaaaaa !important; margin:6px 0 0 0 !important;">
         Consumer lending · 32,572 borrowers · $312.3 Mn exposure</p>
@@ -385,12 +449,12 @@ total_loss_all     = (df["loan_status"] * df["loan_amnt"]).sum()
 
 anchor_rows = []
 for seg in ORDER:
-    s       = df[df["segment"] == seg]
-    n       = len(s)
-    exp     = s["loan_amnt"].sum()
-    exp_mn  = round(exp / 1_000_000, 2)
-    exp_pct = round(exp / total_exposure_all * 100, 1)
-    dr      = round(s["loan_status"].mean() * 100, 1)
+    s        = df[df["segment"] == seg]
+    n        = len(s)
+    exp      = s["loan_amnt"].sum()
+    exp_mn   = round(exp / 1_000_000, 2)
+    exp_pct  = round(exp / total_exposure_all * 100, 1)
+    dr       = round(s["loan_status"].mean() * 100, 1)
     loss_pct = round((s["loan_status"] * s["loan_amnt"]).sum() / total_loss_all * 100, 1)
     base_pd  = s["loan_status"].mean()
     anchor_rows.append({
@@ -421,8 +485,10 @@ def chart_caption(text):
 
 def col_divider():
     st.markdown(
+        "<div class='col-divider-wrap'>"
         "<div style='border-left:1px solid #2d3447; height:100%; "
-        "min-height:380px; margin:0 auto;'></div>",
+        "min-height:380px; margin:0 auto;'></div>"
+        "</div>",
         unsafe_allow_html=True)
 
 def kpi_grid(items):
@@ -533,12 +599,13 @@ with tab1:
     high_risk_pct  = round(
         len(df[df["segment"].isin(["SUBPRIME","HIGH-RISK"])]) / total_loans * 100, 1)
 
+    # Fix 5 — shortened only wrapping labels
     kpi_grid([
-        ("Total Loans Analysed",   f"{total_loans:,}",         "Consumer borrowers"),
+        ("Total Loans",            f"{total_loans:,}",         "Consumer borrowers"),
         ("Total Exposure",         f"${total_exp_mn:,.1f} Mn", "Sum of all loan amounts"),
-        ("Portfolio Default Rate", f"{default_rate}%",         "Share of loans that defaulted"),
+        ("Default Rate",           f"{default_rate}%",         "Share of loans that defaulted"),
         ("Avg Risk Score",         f"{avg_risk_score}",        "Higher = safer (0–100)"),
-        ("Elevated Risk Exposure", f"{high_risk_pct}%",        "SUBPRIME + HIGH-RISK"),
+        ("At-Risk Exposure",       f"{high_risk_pct}%",        "SUBPRIME + HIGH-RISK"),
     ])
 
     insight_box(
@@ -867,7 +934,7 @@ with tab3:
     section_divider()
 
     chart_header("Exposure vs Loss Contribution")
-    chart_caption("Loss bar taller than exposure bar = capital destruction.")
+    # Fix 10 — caption removed entirely
 
     exp_loss_data = pd.DataFrame({
         "Segment": ORDER*2,
