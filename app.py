@@ -117,22 +117,22 @@ st.markdown("""
     }
 
     /* ── TYPOGRAPHY — one size smaller throughout ── */
-    h1 { font-size: 30px !important; font-weight: 800 !important; color: #ffffff !important;
+    h1 { font-size: 32px !important; font-weight: 800 !important; color: #ffffff !important;
          letter-spacing: -0.5px !important; line-height: 1.2 !important; margin-bottom: 6px !important; }
-    h2 { font-size: 22px !important; font-weight: 700 !important; color: #ffffff !important; }
-    h3 { font-size: 18px !important; font-weight: 600 !important; color: #ffffff !important; }
+    h2 { font-size: 24px !important; font-weight: 700 !important; color: #ffffff !important; }
+    h3 { font-size: 19.5px !important; font-weight: 600 !important; color: #ffffff !important; }
 
     p, li,
     [data-testid="stMarkdownContainer"] p,
     [data-testid="stMarkdownContainer"] li {
-        font-size: 14px !important;
+        font-size: 15px !important;
         line-height: 1.75 !important;
         color: #cccccc !important;
     }
     .stCaption,
     [data-testid="stCaptionContainer"] p,
     [data-testid="stCaptionContainer"] {
-        font-size: 13px !important;
+        font-size: 14px !important;
         color: #aaaaaa !important;
     }
 
@@ -205,7 +205,7 @@ st.markdown("""
         margin-bottom: 24px;
     }
     .insight-box p {
-        font-size: 14px !important; color: #e0e0e0 !important;
+        font-size: 15px !important; color: #e0e0e0 !important;
         margin: 0 !important; line-height: 1.75 !important;
     }
 
