@@ -40,11 +40,13 @@ st.markdown("""
 
     /* ── MAIN CONTAINER ── */
     .main .block-container {
-        padding: 52px 2rem 6rem 2rem !important;
+        padding: 0px 2rem 6rem 2rem !important;
         max-width: 1440px !important;
         margin-top: 0 !important;
     }
-
+    [data-testid="stMainBlockContainer"] {
+        padding-top: 52px !important;
+    }
     /* ── KILL GAP BETWEEN HEADER AND KPI CARDS ── */
     [data-testid="stTabs"] {
         margin-top: 0 !important;
@@ -176,6 +178,11 @@ st.markdown("""
         letter-spacing: -0.3px !important;
         line-height: 1.1 !important;
         text-align: center !important;
+    }
+    [data-testid="stMarkdownContainer"] p.kpi-value {
+        color: #00B4D8 !important;
+        font-size: 24px !important;
+        font-weight: 800 !important;
     }
     .kpi-sub {
         font-size: 12px !important;
