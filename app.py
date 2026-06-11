@@ -350,7 +350,24 @@ st.markdown("""
             padding: 14px 8px !important;
         }
     }
+/* ── FORCE FULL WIDTH ON STREAMLIT CLOUD ── */
+.stApp {
+    max-width: 100% !important;
+}
 
+.stMainBlockContainer,
+.stAppViewBlockContainer {
+    max-width: 1440px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 2rem !important;
+    padding-right: 2rem !important;
+}
+
+/* Hide Streamlit Cloud's "Manage app" button so it doesn't overlap footer */
+[data-testid="stToolbar"] {
+    display: none !important;
+}
     </style>
 """, unsafe_allow_html=True)
 
