@@ -346,9 +346,26 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ── Scroll shrink JS ──
+# ── Scroll shrink JS + Cloud viewport fix ──
 components.html("""
 <script>
+function fixCloudScale() {
+    const doc = window.parent.document;
+
+    // Force viewport meta tag
+    let meta = doc.querySelector('meta[name="viewport"]');
+    if (!meta) {
+        meta = doc.createElement('meta');
+        meta.name = 'viewport';
+        doc.head.appendChild(meta);
+    }
+    meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+
+    // Force root font size
+    doc.documentElement.style.fontSize = '16px';
+    doc.body.style.fontSize = '16px';
+}
+
 function initScrollEffect() {
     const doc = window.parent.document;
     const tabList = doc.querySelector('[data-baseweb="tab-list"]');
@@ -366,10 +383,11 @@ function initScrollEffect() {
         }
     });
 }
+
+fixCloudScale();
 initScrollEffect();
 </script>
 """, height=0)
-
 # ── Fixed footer ──
 st.markdown("""
 <div class="footer-bar">
