@@ -30,6 +30,13 @@ st.markdown("""
         border-radius: 6px !important;
         background-color: #1a1f2e !important;
     }
+    .block-container {
+        padding-top: 1rem !important;
+    }
+    [data-testid="stSidebar"] [data-testid="stRadio"] label p {
+        font-size: 15px !important;
+        font-weight: 500 !important;
+    }
     </style>
 """, unsafe_allow_html=True)
 
