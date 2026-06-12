@@ -87,7 +87,7 @@ st.markdown("""
         background: #1a1f2e !important;
         border: 1px solid #2d3447 !important;
         border-radius: 10px !important;
-        padding: 12px 14px !important;
+        padding: 14px 16px !important;
         cursor: pointer !important;
         transition: border-color 0.2s ease, background 0.2s ease !important;
         display: flex !important;
@@ -104,7 +104,7 @@ st.markdown("""
     [data-testid="stSidebar"] [role="radiogroup"] label p,
     [data-testid="stSidebar"] [role="radiogroup"] label div,
     [data-testid="stSidebar"] [role="radiogroup"] label span {
-        font-size: 15px !important;
+        font-size: 17px !important;
         font-weight: 600 !important;
         color: #cccccc !important;
         white-space: nowrap !important;
@@ -121,9 +121,38 @@ st.markdown("""
         accent-color: #00B4D8 !important;
     }
 
-    /* ── COLLAPSE TOGGLE — hidden on desktop, shown on portrait ── */
+    /* ── COLLAPSE TOGGLE ── */
+
+    /* Desktop: sidebar always open, hide the toggle */
     [data-testid="collapsedControl"] {
         display: none !important;
+    }
+
+    /* Landscape phone/tablet: sidebar visible, toggle hidden */
+    @media (max-width: 950px) and (orientation: landscape) {
+        [data-testid="collapsedControl"] {
+            display: none !important;
+        }
+    }
+
+    /* Portrait phone: sidebar collapsed by default, show clean toggle */
+    @media (max-width: 768px) and (orientation: portrait) {
+        [data-testid="collapsedControl"] {
+            display: flex !important;
+            position: fixed !important;
+            top: 10px !important;
+            left: 10px !important;
+            z-index: 9999 !important;
+            background: #1a1f2e !important;
+            border: 1px solid #00B4D8 !important;
+            border-radius: 8px !important;
+            width: 40px !important;
+            height: 40px !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important;
+            cursor: pointer !important;
+        }
     }
 
     /* ── TYPOGRAPHY ── */
@@ -226,7 +255,7 @@ st.markdown("""
         margin: 32px 0; border: none;
     }
 
-    /* ── PLATFORM HEADER — top space 4px ── */
+    /* ── PLATFORM HEADER ── */
     .platform-header {
         padding: 0 0 8px 0 !important;
         border-bottom: 1px solid #2d3447;
@@ -274,21 +303,6 @@ st.markdown("""
         .main .block-container {
             padding: 0 0.8rem 6rem 0.8rem !important;
         }
-        [data-testid="collapsedControl"] {
-            display: flex !important;
-            position: fixed !important;
-            top: 8px !important;
-            left: 8px !important;
-            z-index: 9999 !important;
-            background: #1a1f2e !important;
-            border: 1px solid #00B4D8 !important;
-            border-radius: 8px !important;
-            width: 38px !important;
-            height: 38px !important;
-            align-items: center !important;
-            justify-content: center !important;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
-        }
         .platform-header {
             margin-top: 52px !important;
         }
@@ -331,6 +345,11 @@ st.markdown("""
     /* ── LANDSCAPE PHONE ── */
     @media (max-width: 950px) and (orientation: landscape) {
         .platform-header { margin-top: 4px !important; }
+        [data-testid="stSidebar"] [role="radiogroup"] label p,
+        [data-testid="stSidebar"] [role="radiogroup"] label div,
+        [data-testid="stSidebar"] [role="radiogroup"] label span {
+            font-size: 14px !important;
+        }
         .kpi-value,
         [data-testid="stMarkdownContainer"] p.kpi-value {
             font-size: 16px !important;
@@ -347,7 +366,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# ── Viewport fix + portrait auto-collapse ──
+# ── Viewport fix + orientation-aware sidebar ──
 components.html("""
 <script>
 function fixCloudScale() {
@@ -363,28 +382,52 @@ function fixCloudScale() {
     doc.body.style.fontSize = '16px';
 }
 
-function autoCollapsePortrait() {
-    const isPortrait = window.parent.matchMedia(
+function handleSidebarByOrientation() {
+    const doc         = window.parent.document;
+    const isPortrait  = window.parent.matchMedia(
         "(max-width: 768px) and (orientation: portrait)"
     ).matches;
-    if (!isPortrait) return;
-    if (window.parent.__portraitCollapsed) return;
-    setTimeout(function() {
-        const doc = window.parent.document;
-        const btn = doc.querySelector('[data-testid="collapsedControl"]');
-        if (btn) {
-            btn.click();
-            window.parent.__portraitCollapsed = true;
+    const isLandscape = window.parent.matchMedia(
+        "(max-width: 950px) and (orientation: landscape)"
+    ).matches;
+
+    const collapseBtn = doc.querySelector('[data-testid="collapsedControl"]');
+    const sidebar     = doc.querySelector('[data-testid="stSidebar"]');
+    if (!collapseBtn || !sidebar) return;
+
+    const sidebarWidth = sidebar.getBoundingClientRect().width;
+    const isCollapsed  = sidebarWidth < 50;
+    const isExpanded   = !isCollapsed;
+
+    if (isPortrait) {
+        // Portrait phone: collapse on first load
+        if (isExpanded && !window.parent.__portraitCollapsed) {
+            setTimeout(function() {
+                collapseBtn.click();
+                window.parent.__portraitCollapsed = true;
+            }, 400);
         }
-    }, 500);
+    } else if (isLandscape) {
+        // Landscape phone: force open
+        if (isCollapsed) {
+            setTimeout(function() { collapseBtn.click(); }, 400);
+        }
+    }
+    // Desktop: initial_sidebar_state="expanded" handles it
 }
 
 fixCloudScale();
-autoCollapsePortrait();
+handleSidebarByOrientation();
+
+// Re-run when user rotates device
+window.parent.addEventListener('orientationchange', function() {
+    window.parent.__portraitCollapsed = false;
+    setTimeout(handleSidebarByOrientation, 600);
+});
 </script>
 """, height=0)
 
-# ── Fixed footer — always visible ──
+# ── Fixed footer ──
 st.markdown("""
 <div class="footer-bar">
     <span class="footer-left">
@@ -393,7 +436,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ── Sidebar — navigation only ──
+# ── Sidebar navigation ──
 with st.sidebar:
     st.markdown('<span class="sidebar-nav-label">Navigation</span>', unsafe_allow_html=True)
     page = st.radio(
