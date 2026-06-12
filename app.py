@@ -8,7 +8,7 @@ import plotly.graph_objects as go
 st.set_page_config(
     page_title="Credit Risk Intelligence Platform",
     layout="wide",
-    initial_sidebar_state="auto"
+    initial_sidebar_state="expanded"
 )
 
 if "lgd_value" not in st.session_state:
