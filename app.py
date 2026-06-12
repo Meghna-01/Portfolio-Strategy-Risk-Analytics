@@ -275,13 +275,17 @@ st.markdown("""
 # SIDEBAR — copied exactly from working code
 # ════════════════════════════════════════
 st.sidebar.title("Portfolio Strategy & Risk Analytics")
-page = st.sidebar.radio("", [
-    "📊 Executive Overview",
-    "📈 Portfolio Analysis",
-    "🎯 Capital Allocation Strategy",
-    "⚡ Stress Testing & Scenarios",
-    "📋 Management Recommendations"
-])
+page = st.sidebar.radio(
+    "Navigation",
+    [
+        "📊 Executive Overview",
+        "📈 Portfolio Analysis",
+        "🎯 Capital Allocation Strategy",
+        "⚡ Stress Testing & Scenarios",
+        "📋 Management Recommendations"
+    ],
+    label_visibility="collapsed"
+)
 st.sidebar.markdown("---")
 LGD = st.sidebar.slider(
     "LGD Assumption (%)", min_value=20, max_value=100,
@@ -315,11 +319,7 @@ seg_colors = {
     "HIGH-RISK":  "#E63946"
 }
 
-SCROLL_TOP = """
-    <script>
-        window.parent.document.querySelector('section.main').scrollTo({top: 0, behavior: 'instant'});
-    </script>
-"""
+SCROLL_TOP = ""
 
 df = pd.read_csv("clean_lending_data.csv")
 
@@ -427,7 +427,7 @@ def render_anchor_table():
 # ══════════════════════════════════════════
 if page == "📊 Executive Overview":
 
-    components.html(SCROLL_TOP, height=0)
+st.markdown(SCROLL_TOP, unsafe_allow_html=True)
 
     total_loans    = len(df)
     total_exp_mn   = df["loan_amnt"].sum() / 1_000_000
@@ -596,7 +596,7 @@ if page == "📊 Executive Overview":
 # ══════════════════════════════════════════
 elif page == "📈 Portfolio Analysis":
 
-    components.html(SCROLL_TOP, height=0)
+st.markdown(SCROLL_TOP, unsafe_allow_html=True)
 
     st.subheader("Portfolio Analysis")
     st.caption("Lender Grade Validation, Exposure & Risk-Adjusted Return")
@@ -737,7 +737,7 @@ elif page == "📈 Portfolio Analysis":
 # ══════════════════════════════════════════
 elif page == "🎯 Capital Allocation Strategy":
 
-    components.html(SCROLL_TOP, height=0)
+st.markdown(SCROLL_TOP, unsafe_allow_html=True)
 
     st.subheader("Capital Allocation Strategy")
     st.caption("Exposure vs loss contribution and recommended reallocation.")
@@ -817,7 +817,7 @@ elif page == "🎯 Capital Allocation Strategy":
 # ══════════════════════════════════════════
 elif page == "⚡ Stress Testing & Scenarios":
 
-    components.html(SCROLL_TOP, height=0)
+st.markdown(SCROLL_TOP, unsafe_allow_html=True)
 
     st.subheader("Stress Testing & Scenarios")
     st.caption("What happens to the portfolio under adverse conditions?")
@@ -1066,7 +1066,7 @@ elif page == "⚡ Stress Testing & Scenarios":
 # ══════════════════════════════════════════
 elif page == "📋 Management Recommendations":
 
-    components.html(SCROLL_TOP, height=0)
+st.markdown(SCROLL_TOP, unsafe_allow_html=True)
 
     st.subheader("Management Recommendations")
     st.caption("Executive summary — findings, actions and strategic direction.")
