@@ -334,11 +334,11 @@ if page == "📊 Executive Overview":
 
     st.markdown("---")
     chart_header("Risk Score Distribution — Where Borrowers Cluster")
-chart_caption(
-        "Each cell shows the number of borrowers at that Grade–Segment intersection. "
-        "689 borrowers rated Grade B landed in SUBPRIME. "
-        "In Grade C, 777 landed in SUBPRIME and 209 in HIGH-RISK. "
-        "The lender's grade said moderate risk — the borrower's LTI ratio said otherwise.")
+    chart_caption(
+        "Each bar is a group of borrowers at that score. "
+        "Coloured bands show the four segments. "
+        "Boundaries were placed at the natural dips between clusters — "
+        "where one group ends and the next begins.")
 
     hist_vals, bin_edges = np.histogram(df["risk_score"], bins=40, range=(0, 100))
     hist_centers = (bin_edges[:-1] + bin_edges[1:]) / 2
