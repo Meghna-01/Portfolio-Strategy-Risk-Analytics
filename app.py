@@ -13,6 +13,7 @@ st.set_page_config(
 
 st.markdown("""
     <style>
+    /* ── Metric cards ── */
     [data-testid="stMetricValue"] {
         font-size: 28px;
         font-weight: bold;
@@ -22,20 +23,100 @@ st.markdown("""
         font-size: 14px;
         color: #aaaaaa;
     }
+
+    /* ── Sidebar background ── */
     section[data-testid="stSidebar"] {
         background-color: #0d1117;
     }
+
+    /* ── Sidebar: remove top padding so title sits at top ── */
+    section[data-testid="stSidebar"] > div:first-child {
+        padding-top: 1.2rem !important;
+    }
+
+    /* ── Sidebar title size ── */
+    section[data-testid="stSidebar"] h1 {
+        font-size: 17px !important;
+        line-height: 1.4 !important;
+        margin-bottom: 0.5rem !important;
+    }
+
+    /* ── Sidebar radio tab font ── */
+    [data-testid="stSidebar"] [data-testid="stRadio"] label p {
+        font-size: 15px !important;
+        font-weight: 500 !important;
+        white-space: nowrap !important;
+    }
+
+    /* ── Selectbox styling ── */
     [data-testid="stSelectbox"] > div > div {
         border: 1px solid #00B4D8 !important;
         border-radius: 6px !important;
         background-color: #1a1f2e !important;
     }
+
+    /* ── Remove top black space on main content ── */
     .block-container {
         padding-top: 1rem !important;
+        padding-bottom: 1rem !important;
     }
-    [data-testid="stSidebar"] [data-testid="stRadio"] label p {
-        font-size: 15px !important;
-        font-weight: 500 !important;
+
+    /* ── Responsive metric cards ── */
+    .metric-card-row {
+        display: flex;
+        gap: 12px;
+        margin-bottom: 8px;
+        flex-wrap: wrap;
+    }
+    .metric-card {
+        background: #1a1f2e;
+        border: 1px solid #2d3447;
+        padding: 16px 18px;
+        border-radius: 10px;
+        flex: 1 1 140px;
+        min-width: 0;
+        box-sizing: border-box;
+    }
+    .metric-card p.label {
+        color: #aaaaaa;
+        font-size: 12px;
+        margin: 0 0 6px 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .metric-card p.value {
+        color: #00B4D8;
+        font-size: 18px;
+        font-weight: bold;
+        margin: 0;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+
+    /* ── Mobile: stack cards ── */
+    @media (max-width: 640px) {
+        .metric-card {
+            flex: 1 1 calc(50% - 12px);
+            padding: 12px 14px;
+        }
+        .metric-card p.value {
+            font-size: 16px;
+        }
+        .block-container {
+            padding-left: 0.8rem !important;
+            padding-right: 0.8rem !important;
+        }
+    }
+
+    /* ── Remove excess whitespace after plotly charts ── */
+    .stPlotlyChart {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+    iframe[title="streamlit_plotly_events.streamlit_plotly_events"] {
+        margin-bottom: 0 !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -47,13 +128,14 @@ CHART_CONFIG = {"staticPlot": True}
 
 df = pd.read_csv("clean_lending_data.csv")
 
-st.sidebar.title("Portfolio Strategy & Risk Analytics")
+# ── Shorter tab names — fit on one line, font can be bigger ──
+st.sidebar.title("Portfolio Strategy\n& Risk Analytics")
 page = st.sidebar.radio("", [
-    "📊 Executive Overview",
-    "📈 Portfolio Analysis",
-    "🎯 Capital Allocation Strategy",
-    "📉 Stress Testing & Scenarios",
-    "📋 Management Recommendations"
+    "📊 Overview",
+    "📈 Portfolio",
+    "🎯 Allocation",
+    "📉 Stress Testing",
+    "📋 Recommendations"
 ])
 st.sidebar.markdown("---")
 LGD = st.sidebar.slider("LGD Assumption (%)", min_value=20, max_value=100, value=60, step=5) / 100
@@ -94,13 +176,12 @@ def metric_row(labels, values):
     cards = ""
     for label, value in zip(labels, values):
         cards += f"""
-        <div style="background:#1a1f2e; border:1px solid #2d3447; padding:20px 24px;
-        border-radius:10px; flex:1; min-width:0;">
-            <p style="color:#aaaaaa; font-size:13px; margin:0 0 8px 0; white-space:nowrap;">{label}</p>
-            <p style="color:#00B4D8; font-size:20px; font-weight:bold; margin:0; white-space:nowrap;">{value}</p>
+        <div class="metric-card">
+            <p class="label">{label}</p>
+            <p class="value">{value}</p>
         </div>"""
     st.markdown(
-        f'<div style="display:flex; gap:14px; margin-bottom:8px; flex-wrap:wrap;">{cards}</div>',
+        f'<div class="metric-card-row">{cards}</div>',
         unsafe_allow_html=True)
 
 # ── Anchor segment table computed once ──
@@ -180,7 +261,7 @@ def render_anchor_table(note=""):
 
 
 # ============ PAGE 1 ============
-if page == "📊 Executive Overview":
+if page == "📊 Overview":
 
     components.html(SCROLL_TOP, height=0)
 
@@ -426,11 +507,11 @@ if page == "📊 Executive Overview":
     st.subheader("Segment Summary — The Foundation of This Analysis")
     render_anchor_table()
 
-    st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-bottom:24px;'></div>", unsafe_allow_html=True)
 
 
 # ============ PAGE 2 ============
-elif page == "📈 Portfolio Analysis":
+elif page == "📈 Portfolio":
 
     components.html(SCROLL_TOP, height=0)
 
@@ -614,11 +695,11 @@ elif page == "📈 Portfolio Analysis":
             margin=dict(t=10, b=10, l=10, r=10), height=480)
         st.plotly_chart(fig4, use_container_width=True, config=CHART_CONFIG)
 
-    st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-bottom:24px;'></div>", unsafe_allow_html=True)
 
 
 # ============ PAGE 3 ============
-elif page == "🎯 Capital Allocation Strategy":
+elif page == "🎯 Allocation":
 
     components.html(SCROLL_TOP, height=0)
 
@@ -632,8 +713,7 @@ elif page == "🎯 Capital Allocation Strategy":
         "Reallocation from those segments into PRIME reduces portfolio default rate "
         "without shrinking total book size.")
 
-    st.caption(
-        "📌 All base figures below come from the Executive Overview.")
+    st.caption("📌 All base figures below come from the Executive Overview.")
 
     rows = anchor_rows.copy()
     for r in rows:
@@ -696,11 +776,11 @@ elif page == "🎯 Capital Allocation Strategy":
             margin=dict(t=40, b=40, l=10, r=80), height=480)
         st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
-    st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-bottom:24px;'></div>", unsafe_allow_html=True)
 
 
 # ============ PAGE 4 ============
-elif page == "📉 Stress Testing & Scenarios":
+elif page == "📉 Stress Testing":
 
     components.html(SCROLL_TOP, height=0)
 
@@ -983,11 +1063,11 @@ elif page == "📉 Stress Testing & Scenarios":
         margin=dict(t=40, b=10, l=10, r=10))
     st.plotly_chart(fig_sim, use_container_width=True, config=CHART_CONFIG)
 
-    st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-bottom:24px;'></div>", unsafe_allow_html=True)
 
 
 # ============ PAGE 5 ============
-elif page == "📋 Management Recommendations":
+elif page == "📋 Recommendations":
 
     components.html(SCROLL_TOP, height=0)
 
@@ -1140,4 +1220,4 @@ elif page == "📋 Management Recommendations":
         margin=dict(t=40, b=10, l=80, r=80), height=350)
     st.plotly_chart(fig_final, use_container_width=True, config=CHART_CONFIG)
 
-    st.markdown("<div style='margin-bottom:40px;'></div>", unsafe_allow_html=True)
+    st.markdown("<div style='margin-bottom:24px;'></div>", unsafe_allow_html=True)
