@@ -123,35 +123,37 @@ st.markdown("""
 
     /* ── COLLAPSE TOGGLE ── */
 
-    /* Desktop: sidebar always open, hide the toggle */
+    /* Desktop & landscape: always visible but subtle — fades in on hover */
     [data-testid="collapsedControl"] {
-        display: none !important;
+        display: flex !important;
+        position: fixed !important;
+        top: 10px !important;
+        left: 10px !important;
+        z-index: 9999 !important;
+        background: #1a1f2e !important;
+        border: 1px solid #2d3447 !important;
+        border-radius: 8px !important;
+        width: 36px !important;
+        height: 36px !important;
+        align-items: center !important;
+        justify-content: center !important;
+        opacity: 0.35 !important;
+        transition: opacity 0.2s ease, border-color 0.2s ease !important;
+        cursor: pointer !important;
+    }
+    [data-testid="collapsedControl"]:hover {
+        opacity: 1 !important;
+        border-color: #00B4D8 !important;
     }
 
-    /* Landscape phone/tablet: sidebar visible, toggle hidden */
-    @media (max-width: 950px) and (orientation: landscape) {
-        [data-testid="collapsedControl"] {
-            display: none !important;
-        }
-    }
-
-    /* Portrait phone: sidebar collapsed by default, show clean toggle */
+    /* Portrait phone: fully visible toggle */
     @media (max-width: 768px) and (orientation: portrait) {
         [data-testid="collapsedControl"] {
-            display: flex !important;
-            position: fixed !important;
-            top: 10px !important;
-            left: 10px !important;
-            z-index: 9999 !important;
-            background: #1a1f2e !important;
-            border: 1px solid #00B4D8 !important;
-            border-radius: 8px !important;
+            opacity: 1 !important;
+            border-color: #00B4D8 !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important;
             width: 40px !important;
             height: 40px !important;
-            align-items: center !important;
-            justify-content: center !important;
-            box-shadow: 0 4px 16px rgba(0,0,0,0.5) !important;
-            cursor: pointer !important;
         }
     }
 
@@ -382,7 +384,7 @@ function fixCloudScale() {
     doc.body.style.fontSize = '16px';
 }
 
-function handleSidebarByOrientation() {
+function handleSidebar() {
     const doc         = window.parent.document;
     const isPortrait  = window.parent.matchMedia(
         "(max-width: 768px) and (orientation: portrait)"
@@ -390,39 +392,38 @@ function handleSidebarByOrientation() {
     const isLandscape = window.parent.matchMedia(
         "(max-width: 950px) and (orientation: landscape)"
     ).matches;
+    const isDesktop   = !isPortrait && !isLandscape;
 
-    const collapseBtn = doc.querySelector('[data-testid="collapsedControl"]');
-    const sidebar     = doc.querySelector('[data-testid="stSidebar"]');
-    if (!collapseBtn || !sidebar) return;
+    const sidebar = doc.querySelector('[data-testid="stSidebar"]');
+    const btn     = doc.querySelector('[data-testid="collapsedControl"]');
+    if (!sidebar || !btn) return;
 
-    const sidebarWidth = sidebar.getBoundingClientRect().width;
-    const isCollapsed  = sidebarWidth < 50;
-    const isExpanded   = !isCollapsed;
+    const collapsed = sidebar.getBoundingClientRect().width < 50;
 
-    if (isPortrait) {
-        // Portrait phone: collapse on first load
-        if (isExpanded && !window.parent.__portraitCollapsed) {
-            setTimeout(function() {
-                collapseBtn.click();
-                window.parent.__portraitCollapsed = true;
-            }, 400);
+    if (isDesktop || isLandscape) {
+        // Force sidebar OPEN on desktop and landscape
+        if (collapsed) {
+            btn.click();
         }
-    } else if (isLandscape) {
-        // Landscape phone: force open
-        if (isCollapsed) {
-            setTimeout(function() { collapseBtn.click(); }, 400);
+    } else if (isPortrait) {
+        // Collapse sidebar on portrait — first load only
+        if (!collapsed && !window.parent.__portraitDone) {
+            btn.click();
+            window.parent.__portraitDone = true;
         }
     }
-    // Desktop: initial_sidebar_state="expanded" handles it
 }
 
 fixCloudScale();
-handleSidebarByOrientation();
 
-// Re-run when user rotates device
+// Two attempts — first at 600ms, second at 1400ms as fallback
+setTimeout(handleSidebar, 600);
+setTimeout(handleSidebar, 1400);
+
+// Re-run on device rotate
 window.parent.addEventListener('orientationchange', function() {
-    window.parent.__portraitCollapsed = false;
-    setTimeout(handleSidebarByOrientation, 600);
+    window.parent.__portraitDone = false;
+    setTimeout(handleSidebar, 700);
 });
 </script>
 """, height=0)
