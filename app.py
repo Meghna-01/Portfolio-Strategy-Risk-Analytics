@@ -5,46 +5,18 @@ import numpy as np
 import plotly.express as px
 import plotly.graph_objects as go
 
-# ─────────────────────────────────────────────────────────────
-# 1. FORCE SIDEBAR OPEN FOR ALL USERS (OVERRIDE LOCALSTORAGE)
-# ─────────────────────────────────────────────────────────────
 st.set_page_config(
     page_title="Credit Risk Intelligence Platform",
     layout="wide",
     initial_sidebar_state="expanded"
 )
 
-# JS: Clear sidebar state + force open on EVERY load (no user memory)<!--citation:1-->
-components.html("""
-<script>
-(function() {
-    // Wipe Streamlit's saved sidebar state completely
-    window.parent.localStorage.removeItem('sidebarState');
-    window.parent.localStorage.removeItem('stSidebarCollapsed');
-    window.parent.localStorage.removeItem('streamlit:sidebarCollapsed');
-
-    // Force sidebar open immediately
-    const interval = setInterval(() => {
-        const sb = window.parent.document.querySelector('[data-testid="stSidebar"]');
-        const toggle = window.parent.document.querySelector('[data-testid="collapsedControl"]');
-        if (sb && toggle && sb.offsetWidth < 50) {
-            toggle.click();
-        }
-    }, 100);
-    setTimeout(() => clearInterval(interval), 2000);
-})();
-</script>
-""", height=0)
-
-# Session state
 if "lgd_value" not in st.session_state:
     st.session_state.lgd_value = 60
 
-# ─────────────────────────────────────────────────────────────
-# 2. ORIGINAL CSS — NO CHANGES TO FONTS/SPACING/FOOTER
-# ─────────────────────────────────────────────────────────────
 st.markdown("""
     <style>
+    /* ── STREAMLIT CLOUD SCALING FIX ── */
     html {
         -webkit-text-size-adjust: 100% !important;
         text-size-adjust: 100% !important;
@@ -56,7 +28,7 @@ st.markdown("""
         font-family: 'Inter', sans-serif !important;
     }
 
-    /* ── NO TOP SPACE ── */
+    /* ── KILL ALL TOP SPACE ── */
     html, body { margin-top: 0 !important; padding-top: 0 !important; }
     header[data-testid="stHeader"] {
         display: none !important;
@@ -74,12 +46,12 @@ st.markdown("""
     [data-testid="stAppViewBlockContainer"],
     section[data-testid="stMain"] > div,
     section.main > div {
-        padding-top: 5px !important; /* Tight original top padding */
+        padding-top: 0 !important;
         margin-top: 0 !important;
         max-width: 1440px !important;
     }
     .main .block-container {
-        padding: 5px 2rem 6rem 2rem !important;
+        padding: 0 2rem 6rem 2rem !important;
     }
 
     /* ── SIDEBAR BASE ── */
@@ -115,7 +87,7 @@ st.markdown("""
         background: #1a1f2e !important;
         border: 1px solid #2d3447 !important;
         border-radius: 10px !important;
-        padding: 14px 16px !important;
+        padding: 12px 14px !important;
         cursor: pointer !important;
         transition: border-color 0.2s ease, background 0.2s ease !important;
         display: flex !important;
@@ -132,7 +104,7 @@ st.markdown("""
     [data-testid="stSidebar"] [role="radiogroup"] label p,
     [data-testid="stSidebar"] [role="radiogroup"] label div,
     [data-testid="stSidebar"] [role="radiogroup"] label span {
-        font-size: 17px !important;
+        font-size: 15px !important;
         font-weight: 600 !important;
         color: #cccccc !important;
         white-space: nowrap !important;
@@ -149,30 +121,12 @@ st.markdown("""
         accent-color: #00B4D8 !important;
     }
 
-    /* ── COLLAPSE TOGGLE — visible but does NOT override forced open ── */
+    /* ── COLLAPSE TOGGLE — hidden on desktop, shown on portrait ── */
     [data-testid="collapsedControl"] {
-        display: flex !important;
-        position: fixed !important;
-        top: 10px !important;
-        left: 10px !important;
-        z-index: 9999 !important;
-        background: #1a1f2e !important;
-        border: 1px solid #2d3447 !important;
-        border-radius: 8px !important;
-        width: 36px !important;
-        height: 36px !important;
-        align-items: center !important;
-        justify-content: center !important;
-        opacity: 0.3 !important;
-        transition: opacity 0.2s ease !important;
-        cursor: pointer !important;
-    }
-    [data-testid="collapsedControl"]:hover {
-        opacity: 1 !important;
-        border-color: #00B4D8 !important;
+        display: none !important;
     }
 
-    /* ── TYPOGRAPHY — ORIGINAL SIZES, NO TINY TEXT ── */
+    /* ── TYPOGRAPHY ── */
     h1 { font-size: 32px !important; font-weight: 800 !important; color: #ffffff !important;
          letter-spacing: -0.5px !important; line-height: 1.2 !important; margin-bottom: 6px !important; }
     h2 { font-size: 24px !important; font-weight: 700 !important; color: #ffffff !important; }
@@ -201,16 +155,95 @@ st.markdown("""
         font-size: 13px !important; color: #aaaaaa !important;
         font-weight: 500 !important; text-transform: uppercase !important;
     }
+    [data-testid="stMetricDelta"] { font-size: 13px !important; }
 
-    /* ── FOOTER — Z-INDEX HIGHER THAN SIDEBAR, ALWAYS ON TOP ── */
+    /* ── KPI CARDS ── */
+    .kpi-grid {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 14px;
+        margin-bottom: 24px;
+        margin-top: 0 !important;
+    }
+    .kpi-card {
+        background: #1a1f2e;
+        border: 1px solid #2d3447;
+        border-radius: 12px;
+        padding: 20px 14px;
+        transition: border-color 0.2s ease;
+        text-align: center;
+    }
+    .kpi-card:hover { border-color: #00B4D8; }
+    .kpi-label {
+        font-size: 12px !important;
+        color: #aaaaaa !important;
+        font-weight: 600 !important;
+        text-transform: uppercase !important;
+        letter-spacing: 0.7px !important;
+        margin: 0 0 8px 0 !important;
+        text-align: center !important;
+        line-height: 1.4 !important;
+    }
+    .kpi-value {
+        font-size: 26px !important;
+        font-weight: 800 !important;
+        color: #00B4D8 !important;
+        margin: 0 !important;
+        letter-spacing: -0.3px !important;
+        line-height: 1.1 !important;
+        text-align: center !important;
+    }
+    [data-testid="stMarkdownContainer"] p.kpi-value {
+        color: #00B4D8 !important;
+        font-size: 26px !important;
+        font-weight: 800 !important;
+    }
+    .kpi-sub {
+        font-size: 12px !important;
+        color: #999999 !important;
+        margin: 6px 0 0 0 !important;
+        text-align: center !important;
+        line-height: 1.4 !important;
+    }
+
+    /* ── INSIGHT BOX ── */
+    .insight-box {
+        background: linear-gradient(135deg, #1a2332 0%, #1a1f2e 100%);
+        border-left: 3px solid #00B4D8;
+        border-radius: 0 8px 8px 0;
+        padding: 18px 22px;
+        margin-bottom: 24px;
+    }
+    .insight-box p {
+        font-size: 15px !important; color: #e0e0e0 !important;
+        margin: 0 !important; line-height: 1.75 !important;
+    }
+
+    /* ── SECTION DIVIDER ── */
+    .section-divider {
+        height: 1px;
+        background: linear-gradient(90deg, #00B4D8 0%, #2d3447 60%, transparent 100%);
+        margin: 32px 0; border: none;
+    }
+
+    /* ── PLATFORM HEADER — top space 4px ── */
+    .platform-header {
+        padding: 0 0 8px 0 !important;
+        border-bottom: 1px solid #2d3447;
+        margin-top: 4px !important;
+        margin-bottom: 6px !important;
+    }
+
+    /* ── FIXED FOOTER ── */
     .footer-bar {
         position: fixed; bottom: 0; left: 0; right: 0;
         height: 44px;
         background: rgba(13,17,23,0.99);
         border-top: 1px solid #2d3447;
         display: flex; align-items: center;
+        justify-content: space-between;
         padding: 0 28px;
-        z-index: 99999 !important; /* Above everything */
+        z-index: 1000;
         backdrop-filter: blur(8px);
     }
     .footer-left {
@@ -225,17 +258,133 @@ st.markdown("""
         font-size: 15px !important;
     }
 
-    /* Mobile */
-    @media (max-width: 768px) and (orientation: portrait) {
-        .main .block-container { padding: 0 0.8rem 6rem 0.8rem !important; }
-        .platform-header { margin-top: 52px !important; }
+    /* ── SELECTBOX ── */
+    [data-testid="stSelectbox"] > div > div {
+        border: 1px solid #00B4D8 !important;
+        border-radius: 8px !important;
+        background: #1a1f2e !important;
+        font-size: 14px !important;
     }
+
+    /* ── COL DIVIDER ── */
+    .col-divider-wrap { display: block; }
+
+    /* ── MOBILE PORTRAIT ── */
+    @media (max-width: 768px) and (orientation: portrait) {
+        .main .block-container {
+            padding: 0 0.8rem 6rem 0.8rem !important;
+        }
+        [data-testid="collapsedControl"] {
+            display: flex !important;
+            position: fixed !important;
+            top: 8px !important;
+            left: 8px !important;
+            z-index: 9999 !important;
+            background: #1a1f2e !important;
+            border: 1px solid #00B4D8 !important;
+            border-radius: 8px !important;
+            width: 38px !important;
+            height: 38px !important;
+            align-items: center !important;
+            justify-content: center !important;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.4) !important;
+        }
+        .platform-header {
+            margin-top: 52px !important;
+        }
+        .kpi-grid {
+            display: flex !important;
+            grid-template-columns: none !important;
+            overflow-x: auto !important;
+            overflow-y: hidden !important;
+            gap: 14px !important;
+            padding-bottom: 10px !important;
+            scroll-snap-type: x mandatory !important;
+            -webkit-overflow-scrolling: touch !important;
+        }
+        .kpi-card {
+            min-width: 220px !important;
+            max-width: 220px !important;
+            flex: 0 0 220px !important;
+            scroll-snap-align: start !important;
+            padding: 20px 16px !important;
+        }
+        .kpi-label,
+        .kpi-value,
+        .kpi-sub,
+        [data-testid="stMarkdownContainer"] p.kpi-label,
+        [data-testid="stMarkdownContainer"] p.kpi-value,
+        [data-testid="stMarkdownContainer"] p.kpi-sub {
+            white-space: normal !important;
+            word-break: normal !important;
+            overflow-wrap: normal !important;
+            text-align: center !important;
+        }
+        .kpi-value,
+        [data-testid="stMarkdownContainer"] p.kpi-value {
+            font-size: 26px !important;
+            color: #00B4D8 !important;
+        }
+        .col-divider-wrap { display: none !important; }
+    }
+
+    /* ── LANDSCAPE PHONE ── */
+    @media (max-width: 950px) and (orientation: landscape) {
+        .platform-header { margin-top: 4px !important; }
+        .kpi-value,
+        [data-testid="stMarkdownContainer"] p.kpi-value {
+            font-size: 16px !important;
+            color: #00B4D8 !important;
+            white-space: nowrap !important;
+        }
+        .kpi-label,
+        [data-testid="stMarkdownContainer"] p.kpi-label { font-size: 10px !important; }
+        .kpi-sub,
+        [data-testid="stMarkdownContainer"] p.kpi-sub  { font-size: 10px !important; }
+        .kpi-card { padding: 14px 8px !important; }
+    }
+
     </style>
 """, unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────────────────────
-# 3. FOOTER — VISIBLE ALWAYS, NO OVERLAP
-# ─────────────────────────────────────────────────────────────
+# ── Viewport fix + portrait auto-collapse ──
+components.html("""
+<script>
+function fixCloudScale() {
+    const doc = window.parent.document;
+    let meta = doc.querySelector('meta[name="viewport"]');
+    if (!meta) {
+        meta = doc.createElement('meta');
+        meta.name = 'viewport';
+        doc.head.appendChild(meta);
+    }
+    meta.content = 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no';
+    doc.documentElement.style.fontSize = '16px';
+    doc.body.style.fontSize = '16px';
+}
+
+function autoCollapsePortrait() {
+    const isPortrait = window.parent.matchMedia(
+        "(max-width: 768px) and (orientation: portrait)"
+    ).matches;
+    if (!isPortrait) return;
+    if (window.parent.__portraitCollapsed) return;
+    setTimeout(function() {
+        const doc = window.parent.document;
+        const btn = doc.querySelector('[data-testid="collapsedControl"]');
+        if (btn) {
+            btn.click();
+            window.parent.__portraitCollapsed = true;
+        }
+    }, 500);
+}
+
+fixCloudScale();
+autoCollapsePortrait();
+</script>
+""", height=0)
+
+# ── Fixed footer — always visible ──
 st.markdown("""
 <div class="footer-bar">
     <span class="footer-left">
@@ -244,13 +393,11 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# ─────────────────────────────────────────────────────────────
-# 4. SIDEBAR — ONLY NAV, NO LGD, NO "BUILT BY MEGHNA"
-# ─────────────────────────────────────────────────────────────
+# ── Sidebar — navigation only ──
 with st.sidebar:
     st.markdown('<span class="sidebar-nav-label">Navigation</span>', unsafe_allow_html=True)
     page = st.radio(
-        "Navigation",
+        "nav",
         [
             "📊  Executive Overview",
             "📈  Portfolio Analysis",
@@ -261,12 +408,8 @@ with st.sidebar:
         index=0,
         label_visibility="collapsed"
     )
-    # NO LGD SLIDER HERE
-    # NO FOOTER TEXT HERE
 
-# ─────────────────────────────────────────────────────────────
-# REST OF DASHBOARD CODE (unchanged, original working version)
-# ─────────────────────────────────────────────────────────────
+# ── Platform header ──
 st.markdown("""
 <div class="platform-header">
     <h1 style="margin:0;">Portfolio Strategy & Risk Analytics</h1>
@@ -275,7 +418,7 @@ st.markdown("""
 </div>
 """, unsafe_allow_html=True)
 
-# Constants
+# ── Constants ──
 PALETTE      = ["#00B4D8", "#FFB703", "#FB8500", "#E63946"]
 BG           = "#0E1117"
 ORDER        = ["PRIME", "NEAR-PRIME", "SUBPRIME", "HIGH-RISK"]
@@ -308,7 +451,7 @@ for seg in ORDER:
         "exp_pct": exp_pct, "dr": dr, "loss_pct": loss_pct, "base_pd": base_pd
     })
 
-# Helpers
+# ── Helpers ──
 def section_divider():
     st.markdown('<hr class="section-divider">', unsafe_allow_html=True)
 
@@ -572,6 +715,7 @@ if page == "📊  Executive Overview":
     st.markdown(scoring_html, unsafe_allow_html=True)
 
     section_divider()
+
     st.subheader("Segment Summary — The Foundation of This Analysis")
     render_anchor_table()
     st.markdown("<div style='margin-bottom:60px;'></div>", unsafe_allow_html=True)
@@ -593,10 +737,15 @@ elif page == "📈  Portfolio Analysis":
     section_divider()
 
     st.subheader("Does the Lender's Grade Tell the Full Story?")
+    st.caption(
+        "The original dataset contains lender-assigned grades A–G (A = best, G = lowest). "
+        "This project builds an independent risk segmentation and compares it against the lender's grading.")
+
     chart_header("Grade vs Segment Heatmap")
     chart_caption(
         "689 borrowers rated Grade B landed in SUBPRIME. "
-        "In Grade C, 777 landed in SUBPRIME and 209 in HIGH-RISK.")
+        "In Grade C, 777 landed in SUBPRIME and 209 in HIGH-RISK. "
+        "The lender's grade said moderate risk — the borrower's LTI ratio said otherwise.")
 
     cross = pd.crosstab(df["loan_grade"], df["segment"])
     cross = cross.reindex(columns=[c for c in ORDER if c in cross.columns])
@@ -631,8 +780,7 @@ elif page == "📈  Portfolio Analysis":
                 width=0.55, showlegend=False, cliponaxis=False))
         fig1.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
             font_family="Inter", yaxis_title="Exposure ($ Mn)",
-            yaxis=dict(gridcolor="#1f2630",
-                       range=[0, grade_exposure["Exposure ($ Mn)"].max()*1.25],
+            yaxis=dict(gridcolor="#1f2630", range=[0, grade_exposure["Exposure ($ Mn)"].max()*1.25],
                        tickfont_size=13),
             xaxis=dict(tickfont_size=14),
             margin=dict(t=30, b=20, l=20, r=20), height=360)
@@ -751,8 +899,7 @@ elif page == "🎯  Capital Allocation":
         "Segment": ORDER*2,
         "Metric": ["Exposure %"]*4 + ["Loss Contribution %"]*4,
         "Value": [r["exp_pct"] for r in rows] + [r["loss_pct"] for r in rows]})
-    exp_loss_data["Segment"] = pd.Categorical(
-        exp_loss_data["Segment"], categories=ORDER, ordered=True)
+    exp_loss_data["Segment"] = pd.Categorical(exp_loss_data["Segment"], categories=ORDER, ordered=True)
     fig_el = px.bar(exp_loss_data, x="Segment", y="Value", color="Metric",
         barmode="group", text="Value",
         color_discrete_map={"Exposure %":"#00B4D8","Loss Contribution %":"#E63946"},
@@ -761,11 +908,9 @@ elif page == "🎯  Capital Allocation":
         textfont=dict(size=14), cliponaxis=False)
     fig_el.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
         font_family="Inter", yaxis_title="Percentage (%)",
-        yaxis=dict(gridcolor="#1f2630", range=[0, exp_loss_data["Value"].max()*1.3],
-                   tickfont_size=13),
+        yaxis=dict(gridcolor="#1f2630", range=[0, exp_loss_data["Value"].max()*1.3], tickfont_size=13),
         xaxis=dict(tickfont_size=14), bargap=0.2, bargroupgap=0.05,
-        legend=dict(orientation="h", yanchor="bottom", y=1.02,
-                    xanchor="right", x=1, font_size=14),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font_size=14),
         margin=dict(t=50, b=20, l=20, r=20), height=420)
     st.plotly_chart(fig_el, use_container_width=True, config=CHART_CONFIG)
 
@@ -773,15 +918,13 @@ elif page == "🎯  Capital Allocation":
     chart_header("Recommended Portfolio Reallocation")
     chart_caption("Loss > 2× exposure → Exit | Loss > exposure → Tighten | Loss < 80% exposure → Grow")
 
-    max_alloc = max(max(r["exp_pct"] for r in rows),
-                    max(target_alloc[seg] for seg in ORDER))
+    max_alloc = max(max(r["exp_pct"] for r in rows), max(target_alloc[seg] for seg in ORDER))
     alloc_df = pd.DataFrame({"Segment": ORDER,
         "Current %": [r["exp_pct"] for r in rows],
         "Target %": [target_alloc[seg] for seg in ORDER]})
     alloc_melted = alloc_df.melt(id_vars="Segment",
         value_vars=["Current %","Target %"], var_name="Type", value_name="Value")
-    alloc_melted["Segment"] = pd.Categorical(
-        alloc_melted["Segment"], categories=ORDER, ordered=True)
+    alloc_melted["Segment"] = pd.Categorical(alloc_melted["Segment"], categories=ORDER, ordered=True)
     fig_alloc = px.bar(alloc_melted, y="Segment", x="Value", color="Type",
         barmode="group", text="Value", orientation="h",
         color_discrete_map={"Current %":"#FFB703","Target %":"#00B4D8"},
@@ -792,8 +935,7 @@ elif page == "🎯  Capital Allocation":
         font_family="Inter", xaxis_title="Allocation (%)",
         xaxis=dict(gridcolor="#1f2630", range=[0, max_alloc*1.3], tickfont_size=13),
         yaxis=dict(tickfont_size=14), bargap=0.2, bargroupgap=0.1,
-        legend=dict(orientation="h", yanchor="bottom", y=1.02,
-                    xanchor="right", x=1, font_size=14),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1, font_size=14),
         margin=dict(t=50, b=20, l=20, r=100), height=360)
     st.plotly_chart(fig_alloc, use_container_width=True, config=CHART_CONFIG)
 
@@ -814,7 +956,7 @@ elif page == "📉  Stress Testing":
         "PRIME is the most resilient — its low base default rate means even a severe shock "
         "causes less absolute damage than the same shock applied to HIGH-RISK.")
 
-    st.caption("📌 EL = Exposure × Default Rate × LGD.")
+    st.caption("📌 All base figures below come from the Executive Overview. EL = Exposure × Default Rate × LGD.")
 
     section_divider()
 
@@ -827,9 +969,8 @@ elif page == "📉  Stress Testing":
     scenario = st.selectbox("Select Stress Scenario", options=[
         "Base Case (No Stress)", "Mild Recession (+25% PD)",
         "Severe Recession (+50% PD)", "Extreme Stress (+75% PD)"], index=0)
-    mult_map = {
-        "Base Case (No Stress)":1.00, "Mild Recession (+25% PD)":1.25,
-        "Severe Recession (+50% PD)":1.50, "Extreme Stress (+75% PD)":1.75}
+    mult_map = {"Base Case (No Stress)":1.00, "Mild Recession (+25% PD)":1.25,
+                "Severe Recession (+50% PD)":1.50, "Extreme Stress (+75% PD)":1.75}
     pd_mult = mult_map[scenario]
 
     stress_rows = []
@@ -855,15 +996,20 @@ elif page == "📉  Stress Testing":
     m3.metric("Increase in Loss", f"{el_increase_pct}%",
         delta=f"{el_increase_pct}%", delta_color="inverse")
 
+    st.markdown(
+        "<p style='color:#aaaaaa;font-size:14px !important;margin:10px 0 8px 0;'>"
+        "Full computation chain — Exposure × Default Rate × LGD = Expected Loss.</p>",
+        unsafe_allow_html=True)
+
     el_hdr = (
         '<div style="overflow-x:auto;margin-bottom:16px;">'
         '<table style="width:100%;border-collapse:collapse;">'
         '<thead><tr style="background:#1a1f2e;">'
-        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;">Segment</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;">Exposure</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;">Base DR</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;">LGD</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;">Base EL</th>'
+        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Segment</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Exposure</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Base DR</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">LGD</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Base EL</th>'
         '</tr></thead><tbody>'
     )
     el_body = ""
@@ -892,12 +1038,12 @@ elif page == "📉  Stress Testing":
         '<div style="overflow-x:auto;margin-bottom:16px;">'
         '<table style="width:100%;border-collapse:collapse;">'
         '<thead><tr style="background:#1a1f2e;">'
-        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;">Segment</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;">Base DR</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;">Stressed DR</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;">Base EL</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;">Stressed EL</th>'
-        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;">Additional Loss</th>'
+        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Segment</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Base DR</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Stressed DR</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Base EL</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Stressed EL</th>'
+        '<th style="padding:12px 16px;text-align:right;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Additional Loss</th>'
         '</tr></thead><tbody>'
     )
     s_body = ""
@@ -923,9 +1069,7 @@ elif page == "📉  Stress Testing":
         chart_header("Expected Loss: Base vs Stressed")
         el_df = pd.DataFrame({"Segment": ORDER*2,
             "Scenario": ["Base Case"]*4 + [scenario]*4,
-            "Expected Loss ($ Mn)": (
-                [r["base_el"] for r in stress_rows] +
-                [r["stressed_el"] for r in stress_rows])})
+            "Expected Loss ($ Mn)": [r["base_el"] for r in stress_rows] + [r["stressed_el"] for r in stress_rows]})
         el_df["Segment"] = pd.Categorical(el_df["Segment"], categories=ORDER, ordered=True)
         fig1 = px.bar(el_df, x="Segment", y="Expected Loss ($ Mn)",
             color="Scenario", barmode="group", text="Expected Loss ($ Mn)",
@@ -935,21 +1079,16 @@ elif page == "📉  Stress Testing":
             textfont=dict(size=13), cliponaxis=False)
         fig1.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
             font_family="Inter",
-            yaxis=dict(gridcolor="#1f2630",
-                       range=[0,el_df["Expected Loss ($ Mn)"].max()*1.35],
-                       tickfont_size=13),
+            yaxis=dict(gridcolor="#1f2630", range=[0,el_df["Expected Loss ($ Mn)"].max()*1.35], tickfont_size=13),
             xaxis=dict(tickfont_size=14), bargap=0.2, bargroupgap=0.05,
-            legend=dict(orientation="h",yanchor="bottom",y=1.02,
-                        xanchor="right",x=1,font_size=13),
+            legend=dict(orientation="h",yanchor="bottom",y=1.02,xanchor="right",x=1,font_size=13),
             margin=dict(t=50,b=20,l=20,r=20), height=380)
         st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
     with col2:
         chart_header("Default Rate: Base vs Stressed")
         dr_df = pd.DataFrame({"Segment": ORDER*2,
             "Scenario": ["Base Case"]*4 + [scenario]*4,
-            "Default Rate (%)": (
-                [r["base_dr"] for r in stress_rows] +
-                [r["stressed_dr"] for r in stress_rows])})
+            "Default Rate (%)": [r["base_dr"] for r in stress_rows] + [r["stressed_dr"] for r in stress_rows]})
         dr_df["Segment"] = pd.Categorical(dr_df["Segment"], categories=ORDER, ordered=True)
         fig2 = px.bar(dr_df, x="Segment", y="Default Rate (%)",
             color="Scenario", barmode="group", text="Default Rate (%)",
@@ -959,16 +1098,14 @@ elif page == "📉  Stress Testing":
             textfont=dict(size=13), cliponaxis=False)
         fig2.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
             font_family="Inter",
-            yaxis=dict(gridcolor="#1f2630",
-                       range=[0,dr_df["Default Rate (%)"].max()*1.35],
-                       tickfont_size=13),
+            yaxis=dict(gridcolor="#1f2630", range=[0,dr_df["Default Rate (%)"].max()*1.35], tickfont_size=13),
             xaxis=dict(tickfont_size=14), bargap=0.2, bargroupgap=0.05,
-            legend=dict(orientation="h",yanchor="bottom",y=1.02,
-                        xanchor="right",x=1,font_size=13),
+            legend=dict(orientation="h",yanchor="bottom",y=1.02,xanchor="right",x=1,font_size=13),
             margin=dict(t=50,b=20,l=20,r=20), height=380)
         st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
     section_divider()
+
     st.subheader("Capital Reallocation Simulator")
     st.caption(
         "Simulates future lending decisions — not movement of existing loans. "
@@ -1001,26 +1138,20 @@ elif page == "📉  Stress Testing":
     sub_pd   = sub_data["loan_status"].mean()
     high_pd  = high_data["loan_status"].mean()
 
-    base_port_dr = round(
-        (prime_data["loan_amnt"].sum()*prime_pd +
-         near_data["loan_amnt"].sum()*near_pd +
-         sub_exp_raw*sub_pd + high_exp_raw*high_pd) / total_exp*100, 2)
+    base_port_dr = round((prime_data["loan_amnt"].sum()*prime_pd +
+        near_data["loan_amnt"].sum()*near_pd + sub_exp_raw*sub_pd +
+        high_exp_raw*high_pd)/total_exp*100, 2)
 
     new_total_exp = prime_exp_new+near_exp_new+sub_exp_new+high_exp_new
-    new_port_dr   = round(
-        (prime_exp_new*prime_pd + near_exp_new*near_pd +
-         sub_exp_new*sub_pd + high_exp_new*high_pd) / new_total_exp*100, 2)
+    new_port_dr = round((prime_exp_new*prime_pd + near_exp_new*near_pd +
+        sub_exp_new*sub_pd + high_exp_new*high_pd)/new_total_exp*100, 2)
 
-    base_port_el = round(
-        (prime_data["loan_amnt"].sum()*prime_pd*LGD_p4 +
-         near_data["loan_amnt"].sum()*near_pd*LGD_p4 +
-         sub_exp_raw*sub_pd*LGD_p4 +
-         high_exp_raw*high_pd*LGD_p4) / 1_000_000, 2)
+    base_port_el = round((prime_data["loan_amnt"].sum()*prime_pd*LGD_p4 +
+        near_data["loan_amnt"].sum()*near_pd*LGD_p4 + sub_exp_raw*sub_pd*LGD_p4 +
+        high_exp_raw*high_pd*LGD_p4)/1_000_000, 2)
 
-    new_port_el = round(
-        (prime_exp_new*prime_pd*LGD_p4 + near_exp_new*near_pd*LGD_p4 +
-         sub_exp_new*sub_pd*LGD_p4 +
-         high_exp_new*high_pd*LGD_p4) / 1_000_000, 2)
+    new_port_el = round((prime_exp_new*prime_pd*LGD_p4 + near_exp_new*near_pd*LGD_p4 +
+        sub_exp_new*sub_pd*LGD_p4 + high_exp_new*high_pd*LGD_p4)/1_000_000, 2)
 
     r1, r2, r3, r4 = st.columns(4)
     r1.metric("Base Default Rate", f"{base_port_dr}%")
@@ -1046,8 +1177,7 @@ elif page == "📉  Stress Testing":
             round(sub_exp_raw/1_000_000,2), round(high_exp_raw/1_000_000,2),
             round(prime_exp_new/1_000_000,2), round(near_exp_new/1_000_000,2),
             round(sub_exp_new/1_000_000,2), round(high_exp_new/1_000_000,2)]})
-    realloc_data["Segment"] = pd.Categorical(
-        realloc_data["Segment"], categories=ORDER, ordered=True)
+    realloc_data["Segment"] = pd.Categorical(realloc_data["Segment"], categories=ORDER, ordered=True)
     fig_sim = px.bar(realloc_data, x="Segment", y="Exposure ($ Mn)", color="Type",
         barmode="group", text="Exposure ($ Mn)",
         color_discrete_map={"Current":"#FFB703","Simulated":"#00B4D8"},
@@ -1056,12 +1186,9 @@ elif page == "📉  Stress Testing":
         textfont=dict(size=14), cliponaxis=False)
     fig_sim.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
         font_family="Inter", yaxis_title="Exposure ($ Mn)",
-        yaxis=dict(gridcolor="#1f2630",
-                   range=[0, realloc_data["Exposure ($ Mn)"].max()*1.3],
-                   tickfont_size=13),
+        yaxis=dict(gridcolor="#1f2630", range=[0, realloc_data["Exposure ($ Mn)"].max()*1.3], tickfont_size=13),
         xaxis=dict(tickfont_size=14), bargap=0.2, bargroupgap=0.05,
-        legend=dict(orientation="h",yanchor="bottom",y=1.02,
-                    xanchor="right",x=1,font_size=14),
+        legend=dict(orientation="h",yanchor="bottom",y=1.02,xanchor="right",x=1,font_size=14),
         margin=dict(t=50,b=20,l=20,r=20), height=380)
     st.plotly_chart(fig_sim, use_container_width=True, config=CHART_CONFIG)
 
@@ -1105,21 +1232,20 @@ elif page == "📋  Recommendations":
     tot_raw = sum(raw_t.values())
     t_alloc = {seg: round(val/tot_raw*100,1) for seg,val in raw_t.items()}
 
-    worst_seg  = max(ORDER,
-        key=lambda s: seg_stats[s]["loss_pct"]/seg_stats[s]["exp_pct"])
+    worst_seg  = max(ORDER, key=lambda s: seg_stats[s]["loss_pct"]/seg_stats[s]["exp_pct"])
     best_yield = max(ORDER, key=lambda s: seg_stats[s]["net_yield"])
-    hr_gap     = round(
-        seg_stats["HIGH-RISK"]["loss_pct"]-seg_stats["HIGH-RISK"]["exp_pct"],1)
+    hr_gap     = round(seg_stats["HIGH-RISK"]["loss_pct"]-seg_stats["HIGH-RISK"]["exp_pct"],1)
 
     kpi_grid([
         ("Portfolio Default Rate",   f"{portfolio_dr}%",    "Across all 32,572 loans"),
         ("Highest Loss Contributor", worst_seg,             "Loss ÷ Exposure ratio"),
         ("Best Net Yield Segment",   best_yield,            "After expected loss"),
         ("HIGH-RISK Loss Excess",    f"+{hr_gap}%",         "Loss % above exposure %"),
-        ("LGD Assumption",           f"{int(LGD_p5*100)}%", "Set on Stress Testing page"),
+        ("LGD Assumption",           f"{int(LGD_p5*100)}%", "Adjust on Stress Testing tab"),
     ])
 
     section_divider()
+
     st.subheader("Analysis Summary")
 
     high_exp     = seg_stats["HIGH-RISK"]["exp_pct"]
@@ -1127,8 +1253,7 @@ elif page == "📋  Recommendations":
     high_ratio   = round(high_loss/high_exp, 1)
     prime_dr     = seg_stats["PRIME"]["dr"]
     prime_yield  = seg_stats["PRIME"]["net_yield"]
-    sub_exit_pct = round(
-        seg_stats["SUBPRIME"]["exp_pct"]*0.5 + seg_stats["HIGH-RISK"]["exp_pct"], 1)
+    sub_exit_pct = round(seg_stats["SUBPRIME"]["exp_pct"]*0.5 + seg_stats["HIGH-RISK"]["exp_pct"], 1)
 
     findings = [
         f"The portfolio carries a <b style='color:#FFB703'>{portfolio_dr}% overall default rate</b>. "
@@ -1153,9 +1278,9 @@ elif page == "📋  Recommendations":
     st.markdown(fhtml, unsafe_allow_html=True)
 
     section_divider()
+
     st.subheader("Recommended Actions")
-    st.caption("Loss > 2× exposure → Exit · Loss > exposure → Tighten · "
-               "Loss < 80% exposure → Grow · otherwise → Maintain")
+    st.caption("Loss > 2× exposure → Exit · Loss > exposure → Tighten · Loss < 80% exposure → Grow · otherwise → Maintain")
 
     actions = [
         ("PRIME", rec_map["PRIME"][0], rec_map["PRIME"][1],
@@ -1164,25 +1289,23 @@ elif page == "📋  Recommendations":
         ("NEAR-PRIME", rec_map["NEAR-PRIME"][0], rec_map["NEAR-PRIME"][1],
          "Maintain with stricter underwriting on LTI > 25%",
          f"{seg_stats['NEAR-PRIME']['dr']}% default rate. "
-         f"Loss {seg_stats['NEAR-PRIME']['loss_pct']}% vs "
-         f"exposure {seg_stats['NEAR-PRIME']['exp_pct']}%."),
+         f"Loss {seg_stats['NEAR-PRIME']['loss_pct']}% vs exposure {seg_stats['NEAR-PRIME']['exp_pct']}%."),
         ("SUBPRIME", rec_map["SUBPRIME"][0], rec_map["SUBPRIME"][1],
          f"Reduce from {seg_stats['SUBPRIME']['exp_pct']}% to {t_alloc['SUBPRIME']}%",
          f"{seg_stats['SUBPRIME']['dr']}% default rate. Loss exceeds exposure share."),
         ("HIGH-RISK", rec_map["HIGH-RISK"][0], rec_map["HIGH-RISK"][1],
          "Stop new originations. Wind down.",
          f"{seg_stats['HIGH-RISK']['dr']}% default rate. "
-         f"{seg_stats['HIGH-RISK']['loss_pct']}% of losses on "
-         f"{seg_stats['HIGH-RISK']['exp_pct']}% exposure.")
+         f"{seg_stats['HIGH-RISK']['loss_pct']}% of losses on {seg_stats['HIGH-RISK']['exp_pct']}% exposure.")
     ]
 
     a_hdr = (
         '<div style="overflow-x:auto;"><table style="width:100%;border-collapse:collapse;">'
         '<thead><tr style="background:#1a1f2e;">'
-        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;">Segment</th>'
-        '<th style="padding:12px 16px;text-align:center;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;">Action</th>'
-        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;">What to Do</th>'
-        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;">Why</th>'
+        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Segment</th>'
+        '<th style="padding:12px 16px;text-align:center;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Action</th>'
+        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">What to Do</th>'
+        '<th style="padding:12px 16px;text-align:left;border-bottom:1px solid #2d3447;font-size:12px;color:#aaa;text-transform:uppercase;letter-spacing:0.6px;">Why</th>'
         '</tr></thead><tbody>'
     )
     a_body = ""
@@ -1192,23 +1315,21 @@ elif page == "📋  Recommendations":
             f'<tr style="background:#0e1117;border-bottom:1px solid #1a1f2e;">'
             f'<td style="padding:12px 16px;color:white;font-weight:700;font-size:14px;">{seg}</td>'
             f'<td style="padding:12px 16px;text-align:center;">'
-            f'<span style="background:{color}22;color:{color};'
-            f'border:1px solid {color};{badge}">{rec}</span></td>'
+            f'<span style="background:{color}22;color:{color};border:1px solid {color};{badge}">{rec}</span></td>'
             f'<td style="padding:12px 16px;color:#ccc;font-size:14px;">{what}</td>'
             f'<td style="padding:12px 16px;color:#aaa;font-size:13px;">{why}</td>'
             f'</tr>')
     st.markdown(a_hdr + a_body + "</tbody></table></div>", unsafe_allow_html=True)
 
     section_divider()
+
     chart_header("Current vs Target Portfolio Allocation")
-    final_alloc = pd.DataFrame({
-        "Segment": ORDER,
+    final_alloc = pd.DataFrame({"Segment": ORDER,
         "Current %": [seg_stats[seg]["exp_pct"] for seg in ORDER],
         "Target %": [t_alloc[seg] for seg in ORDER]})
     final_melted = final_alloc.melt(id_vars="Segment",
         value_vars=["Current %","Target %"], var_name="Type", value_name="Value")
-    final_melted["Segment"] = pd.Categorical(
-        final_melted["Segment"], categories=ORDER, ordered=True)
+    final_melted["Segment"] = pd.Categorical(final_melted["Segment"], categories=ORDER, ordered=True)
     max_val = final_melted["Value"].max()
     fig_fin = px.bar(final_melted, y="Segment", x="Value", color="Type",
         barmode="group", text="Value", orientation="h",
@@ -1220,8 +1341,7 @@ elif page == "📋  Recommendations":
         font_family="Inter", xaxis_title="Allocation (%)",
         xaxis=dict(gridcolor="#1f2630", range=[0,max_val*1.3], tickfont_size=13),
         yaxis=dict(tickfont_size=14), bargap=0.2, bargroupgap=0.1,
-        legend=dict(orientation="h",yanchor="bottom",y=1.02,
-                    xanchor="right",x=1,font_size=14),
+        legend=dict(orientation="h",yanchor="bottom",y=1.02,xanchor="right",x=1,font_size=14),
         margin=dict(t=50,b=20,l=20,r=100), height=300)
     st.plotly_chart(fig_fin, use_container_width=True, config=CHART_CONFIG)
 
