@@ -37,13 +37,13 @@ st.markdown("""
     /* ── Sidebar inner width portrait phone ── */
     @media (max-width: 768px) {
         section[data-testid="stSidebar"] > div:first-child {
-            width: 240px !important;
+            width: 280px !important;
         }
         [data-testid="stSidebarContent"] h1 {
             font-size: 14px !important;
         }
         [data-testid="stSidebar"] [data-testid="stRadio"] label p {
-            font-size: 12.75px !important;
+            font-size: 12px !important;
             white-space: normal !important;
         }
     }
