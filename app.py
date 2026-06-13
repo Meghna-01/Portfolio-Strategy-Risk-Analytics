@@ -43,7 +43,7 @@ st.markdown("""
             font-size: 14px !important;
         }
         [data-testid="stSidebar"] [data-testid="stRadio"] label p {
-            font-size: 13px !important;
+            font-size: 12.75px !important;
             white-space: normal !important;
         }
     }
