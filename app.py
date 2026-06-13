@@ -39,18 +39,19 @@ st.markdown("""
         padding-top: 0.6rem !important;
     }
 
-    /* ── Sidebar title ── */
+    /* ── Sidebar title — bigger, centered ── */
     [data-testid="stSidebarContent"] h1 {
-        font-size: 16px !important;
+        font-size: 18px !important;
         font-weight: 700 !important;
-        line-height: 1.4 !important;
+        line-height: 1.5 !important;
         color: #ffffff !important;
         margin-top: 0 !important;
-        margin-bottom: 0.5rem !important;
+        margin-bottom: 0.6rem !important;
         padding-top: 0 !important;
+        text-align: center !important;
     }
 
-    /* ── Sidebar radio labels — bigger font ── */
+    /* ── Sidebar radio labels ── */
     [data-testid="stSidebar"] [data-testid="stRadio"] label p {
         font-size: 16px !important;
         font-weight: 500 !important;
@@ -93,15 +94,15 @@ st.markdown("""
     }
     .metric-card p.label {
         color: #aaaaaa;
-        font-size: 13px;
-        margin: 0 0 6px 0;
+        font-size: 14px;
+        margin: 0 0 8px 0;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
     }
     .metric-card p.value {
         color: #00B4D8;
-        font-size: 20px;
+        font-size: 24px;
         font-weight: bold;
         margin: 0;
         white-space: nowrap;
@@ -115,7 +116,7 @@ st.markdown("""
         padding-bottom: 0 !important;
     }
 
-    /* ── Fixed footer — always visible over sidebar and content ── */
+    /* ── Fixed footer ── */
     .fixed-footer {
         position: fixed;
         bottom: 0;
@@ -141,27 +142,20 @@ st.markdown("""
             padding: 12px 14px;
         }
         .metric-card p.value {
-            font-size: 17px;
+            font-size: 20px;
         }
         .metric-card p.label {
-            font-size: 12px;
+            font-size: 13px;
         }
         .block-container {
             padding-left: 0.8rem !important;
             padding-right: 0.8rem !important;
         }
     }
-
-    /* ── Portrait phone: sidebar collapsed by default ── */
-    @media (max-width: 768px) and (orientation: portrait) {
-        section[data-testid="stSidebar"] {
-            display: none;
-        }
-    }
     </style>
 """, unsafe_allow_html=True)
 
-# ── Persistent footer injected once ──
+# ── Persistent footer ──
 st.markdown("""
     <div class="fixed-footer">
         Built by <span>Meghna</span>
@@ -187,7 +181,7 @@ st.sidebar.markdown("---")
 LGD = st.sidebar.slider("LGD Assumption (%)", min_value=20, max_value=100, value=60, step=5) / 100
 st.sidebar.markdown(
     f"<p style='color:#aaaaaa; font-size:13px; margin-top:4px;'>"
-    f"Loss Given Default = {int(LGD*100)}% (percentage of loan value not recovered after default)</p>",
+    f"Loss Given Default = {int(LGD*100)}% — percentage of loan value not recovered after default.</p>",
     unsafe_allow_html=True)
 st.sidebar.markdown("---")
 
@@ -198,7 +192,6 @@ SCROLL_TOP = """
 """
 
 def sub_caption(text):
-    """Replaces st.caption() with readable 14px text."""
     st.markdown(
         f"<p style='color:#aaaaaa; font-size:14px; margin-top:-4px; margin-bottom:12px; "
         f"line-height:1.6;'>{text}</p>",
@@ -355,7 +348,8 @@ if page == "📊 Executive Overview":
         len(df[df["segment"].isin(["SUBPRIME", "HIGH-RISK"])]) / total_loans * 100, 1)
 
     metric_row(
-        ["Total Loans", "Total Exposure", "Portfolio Default Rate", "Avg Risk Score", "High-Risk Exposure"],
+        ["Total Loans", "Total Exposure", "Portfolio Default Rate",
+         "Avg Risk Score", "High-Risk Exposure"],
         [f"{total_loans:,}", f"${total_exposure_mn:,.1f} Mn", f"{default_rate}%",
          f"{avg_risk_score}", f"{high_risk_pct}%"]
     )
@@ -370,12 +364,11 @@ if page == "📊 Executive Overview":
     st.subheader("How the Risk Score Was Built")
     sub_caption(
         "Each factor was plotted against default rate across all 32,572 borrowers. "
-        "LTI showed three distinct zones — flat below 15%, climbing between 15–40%, spiking sharply above 40%. "
-        "Employment length showed a steady improvement with tenure. "
-        "Credit history was nearly flat throughout — which is why it received the lowest weight. "
-        "Weights were derived by dividing each factor's default rate spread by the total spread across all factors (94 points). "
-        "Max penalty points equal the weight — so the total penalty pool is exactly 100. "
-        "A perfect borrower scores 100. The worst possible borrower scores 0."
+        "LTI showed three distinct zones — flat below 15%, climbing between 15–40%, "
+        "spiking sharply above 40%. Employment length showed steady improvement with tenure. "
+        "Credit history was nearly flat throughout — lowest weight. "
+        "Weights = each factor's default rate spread ÷ total spread (94 pts). "
+        "A perfect borrower scores 100. The worst scores 0."
     )
 
     scoring_html = """
@@ -435,9 +428,8 @@ if page == "📊 Executive Overview":
     st.markdown("---")
     st.subheader("Risk Segments")
     sub_caption(
-        "Every borrower receives a final risk score from 0 to 100. Higher score means lower risk. "
-        "The score distribution below shows how the borrower population clusters — "
-        "segment boundaries sit at the natural dips between those clusters.")
+        "Every borrower receives a final risk score from 0 to 100. Higher score = lower risk. "
+        "Boundaries were placed at the natural dips between clusters in the score distribution below.")
 
     seg_def_html = """
     <div style="overflow-x:auto; margin-bottom:16px;">
@@ -534,7 +526,8 @@ if page == "📊 Executive Overview":
         chart_header("Portfolio Composition by Risk Tier")
         seg_counts = df["segment"].value_counts().reset_index()
         seg_counts.columns = ["Segment", "Count"]
-        seg_counts["Segment"] = pd.Categorical(seg_counts["Segment"], categories=ORDER, ordered=True)
+        seg_counts["Segment"] = pd.Categorical(
+            seg_counts["Segment"], categories=ORDER, ordered=True)
         seg_counts = seg_counts.sort_values("Segment")
         fig1 = px.pie(seg_counts, names="Segment", values="Count", hole=0.55,
             color_discrete_sequence=PALETTE)
@@ -545,7 +538,8 @@ if page == "📊 Executive Overview":
         chart_header("Default Rate by Risk Tier")
         seg_default = df.groupby("segment")["loan_status"].mean().mul(100).round(1).reset_index()
         seg_default.columns = ["Segment", "Default Rate"]
-        seg_default["Segment"] = pd.Categorical(seg_default["Segment"], categories=ORDER, ordered=True)
+        seg_default["Segment"] = pd.Categorical(
+            seg_default["Segment"], categories=ORDER, ordered=True)
         seg_default = seg_default.sort_values("Segment").reset_index(drop=True)
         fig2 = go.Figure()
         for i, row in seg_default.iterrows():
@@ -553,9 +547,11 @@ if page == "📊 Executive Overview":
                 x=[row["Segment"]], y=[row["Default Rate"]],
                 text=[str(row["Default Rate"]) + "%"],
                 textposition="outside", textfont=dict(size=14, color="white"),
-                marker_color=PALETTE[i], width=0.6, showlegend=False, cliponaxis=False))
+                marker_color=PALETTE[i], width=0.6, showlegend=False,
+                cliponaxis=False))
         fig2.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-            yaxis=dict(gridcolor="#1f2630", range=[0, seg_default["Default Rate"].max() * 1.25]),
+            yaxis=dict(gridcolor="#1f2630",
+                range=[0, seg_default["Default Rate"].max() * 1.25]),
             margin=dict(t=30, b=10, l=10, r=10), height=400)
         st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
@@ -576,22 +572,25 @@ elif page == "📈 Portfolio Analysis":
 
     insight_box(
         "The lender charges higher interest rates for lower grades — directionally correct. "
-        "But from Grade D onwards, default losses outpace the extra interest charged and net yield turns negative. "
+        "But from Grade D onwards, default losses outpace the extra interest charged "
+        "and net yield turns negative. "
         "The lender is taking more risk without adequate compensation.")
 
     st.subheader("Does the Lender's Grade Tell the Full Story?")
     sub_caption(
         "The original dataset contains lender-assigned grades A–G (A = best quality, G = lowest). "
-        "This project builds an independent risk segmentation and compares it against the lender's grading system. "
-        "Where the two disagree — the heatmap below shows it.")
+        "This project builds an independent risk segmentation and compares it against "
+        "the lender's grading system. Where the two disagree — the heatmap below shows it.")
 
     grade_def_html = """
     <div style="overflow-x:auto; margin-bottom:16px;">
     <table style="width:100%; border-collapse:collapse; font-size:15px;">
     <thead>
     <tr style="background:#1a1f2e; color:#aaaaaa; font-size:14px;">
-        <th style="padding:11px 16px; text-align:center; border-bottom:1px solid #2d3447; white-space:nowrap;">Grade</th>
-        <th style="padding:11px 16px; text-align:left; border-bottom:1px solid #2d3447;">Lender's Assessment</th>
+        <th style="padding:11px 16px; text-align:center; border-bottom:1px solid #2d3447;
+        white-space:nowrap;">Grade</th>
+        <th style="padding:11px 16px; text-align:left;
+        border-bottom:1px solid #2d3447;">Lender's Assessment</th>
     </tr>
     </thead>
     <tbody>
@@ -631,14 +630,24 @@ elif page == "📈 Portfolio Analysis":
 
     st.markdown("---")
     chart_header("Grade vs Segment Heatmap")
-    chart_caption(
-        "Each cell shows the number of borrowers at that Grade–Segment intersection. "
-        "Concentrations of HIGH-RISK or SUBPRIME borrowers inside Grade B or C indicate "
-        "potential misclassification — the lender's grade said average, "
-        "the borrower's actual income and employment profile said otherwise.")
 
+    # ── Compute actual heatmap values from data for accurate caption ──
     cross = pd.crosstab(df["loan_grade"], df["segment"])
     cross = cross.reindex(columns=[c for c in ORDER if c in cross.columns])
+
+    # Pull exact numbers directly from data for caption
+    b_subprime  = int(cross.loc["B", "SUBPRIME"])  if "B" in cross.index and "SUBPRIME"  in cross.columns else 0
+    b_highrisk  = int(cross.loc["B", "HIGH-RISK"]) if "B" in cross.index and "HIGH-RISK" in cross.columns else 0
+    c_subprime  = int(cross.loc["C", "SUBPRIME"])  if "C" in cross.index and "SUBPRIME"  in cross.columns else 0
+    c_highrisk  = int(cross.loc["C", "HIGH-RISK"]) if "C" in cross.index and "HIGH-RISK" in cross.columns else 0
+
+    chart_caption(
+        f"Each cell = number of borrowers at that Grade–Segment intersection. "
+        f"Grade B borrowers: {b_subprime:,} landed in SUBPRIME, {b_highrisk:,} in HIGH-RISK — "
+        f"the lender rated them low risk but their LTI ratio said otherwise. "
+        f"Grade C borrowers: {c_subprime:,} in SUBPRIME and {c_highrisk:,} in HIGH-RISK — "
+        f"the lender's moderate-risk label masked serious underlying stress.")
+
     fig_heat = px.imshow(
         cross,
         color_continuous_scale=[
@@ -663,9 +672,11 @@ elif page == "📈 Portfolio Analysis":
         col_divider()
     with col1:
         chart_header("Exposure by Loan Grade")
-        grade_exposure = df.groupby("loan_grade")["loan_amnt"].sum().div(1_000_000).round(2).reset_index()
+        grade_exposure = df.groupby("loan_grade")["loan_amnt"].sum().div(
+            1_000_000).round(2).reset_index()
         grade_exposure.columns = ["Grade", "Exposure ($ Mn)"]
-        grade_exposure = grade_exposure.sort_values("Grade", ascending=True).reset_index(drop=True)
+        grade_exposure = grade_exposure.sort_values(
+            "Grade", ascending=True).reset_index(drop=True)
         grade_colors = PALETTE + ["#90E0EF", "#CAF0F8", "#48CAE4"]
         fig1 = go.Figure()
         for i, row in grade_exposure.iterrows():
@@ -677,19 +688,22 @@ elif page == "📈 Portfolio Analysis":
                 width=0.6, showlegend=False, cliponaxis=False))
         fig1.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
             yaxis_title="Exposure ($ Mn)",
-            yaxis=dict(gridcolor="#1f2630", range=[0, grade_exposure["Exposure ($ Mn)"].max() * 1.2]),
+            yaxis=dict(gridcolor="#1f2630",
+                range=[0, grade_exposure["Exposure ($ Mn)"].max() * 1.2]),
             margin=dict(t=30, b=10, l=10, r=10), height=420)
         st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
     with col2:
         chart_header("Default Rate by Loan Grade")
-        grade_default = df.groupby("loan_grade")["loan_status"].mean().mul(100).round(1).reset_index()
+        grade_default = df.groupby("loan_grade")["loan_status"].mean().mul(
+            100).round(1).reset_index()
         grade_default.columns = ["Grade", "Default Rate"]
         grade_default = grade_default.sort_values("Grade").reset_index(drop=True)
         max_dr = grade_default["Default Rate"].max()
         min_dr = grade_default["Default Rate"].min()
         fig2 = go.Figure()
         for i, row in grade_default.iterrows():
-            ratio = (row["Default Rate"] - min_dr) / (max_dr - min_dr) if max_dr != min_dr else 0.5
+            ratio = (row["Default Rate"] - min_dr) / (
+                max_dr - min_dr) if max_dr != min_dr else 0.5
             if ratio < 0.5:
                 r = int(ratio * 2 * 255); g = int(180); b = int(216 - ratio * 2 * 216)
             else:
@@ -701,7 +715,8 @@ elif page == "📈 Portfolio Analysis":
                 marker_color=f"rgb({r},{g},{b})",
                 width=0.6, showlegend=False, cliponaxis=False))
         fig2.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-            yaxis=dict(gridcolor="#1f2630", range=[0, grade_default["Default Rate"].max() * 1.2]),
+            yaxis=dict(gridcolor="#1f2630",
+                range=[0, grade_default["Default Rate"].max() * 1.2]),
             margin=dict(t=30, b=10, l=10, r=10), height=420)
         st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
@@ -719,7 +734,8 @@ elif page == "📈 Portfolio Analysis":
         grade_rar = df.groupby("loan_grade").agg(
             Avg_Rate=("loan_int_rate", "mean"),
             Default_Rate=("loan_status", "mean")).reset_index()
-        grade_rar["Net_Yield"] = (grade_rar["Avg_Rate"] - (grade_rar["Default_Rate"] * 100 * LGD)).round(2)
+        grade_rar["Net_Yield"] = (
+            grade_rar["Avg_Rate"] - (grade_rar["Default_Rate"] * 100 * LGD)).round(2)
         grade_rar = grade_rar.sort_values("loan_grade").reset_index(drop=True)
         min_yield = grade_rar["Net_Yield"].min()
         max_yield = grade_rar["Net_Yield"].max()
@@ -739,12 +755,14 @@ elif page == "📈 Portfolio Analysis":
     with col4:
         chart_header("Interest Rate vs Risk Score")
         chart_caption(
-            "Each dot is a borrower. In a well-priced portfolio, dots trend downward left to right — "
-            "riskier borrowers pay more. Wide scatter = mispricing.")
+            "Each dot is a borrower. In a well-priced portfolio, dots trend downward "
+            "left to right — riskier borrowers pay more. Wide scatter = mispricing.")
         sample = df.sample(2000, random_state=42)
         fig4 = px.scatter(sample, x="risk_score", y="loan_int_rate", color="segment",
-            color_discrete_sequence=PALETTE, category_orders={"segment": ORDER}, opacity=0.6,
-            labels={"risk_score": "Risk Score", "loan_int_rate": "Interest Rate (%)", "segment": "Segment"})
+            color_discrete_sequence=PALETTE,
+            category_orders={"segment": ORDER}, opacity=0.6,
+            labels={"risk_score": "Risk Score",
+                    "loan_int_rate": "Interest Rate (%)", "segment": "Segment"})
         fig4.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
             xaxis=dict(gridcolor="#1f2630"), yaxis=dict(gridcolor="#1f2630"),
             margin=dict(t=10, b=10, l=10, r=10), height=480)
@@ -759,7 +777,9 @@ elif page == "🎯 Capital Allocation Strategy":
     components.html(SCROLL_TOP, height=0)
 
     st.title("🎯 Capital Allocation Strategy")
-    sub_caption("Where should capital be deployed? Exposure vs loss contribution and recommended reallocation.")
+    sub_caption(
+        "Where should capital be deployed? "
+        "Exposure vs loss contribution and recommended reallocation.")
     st.markdown("---")
 
     insight_box(
@@ -781,7 +801,8 @@ elif page == "🎯 Capital Allocation Strategy":
     alloc_multiplier = {"Grow": 1.1, "Maintain": 1.0, "Tighten": 0.5, "Exit": 0.0}
     raw_targets = {r["seg"]: r["exp_pct"] * alloc_multiplier[r["rec"]] for r in rows}
     total_raw = sum(raw_targets.values())
-    target_alloc = {seg: round(val / total_raw * 100, 1) for seg, val in raw_targets.items()}
+    target_alloc = {seg: round(val / total_raw * 100, 1)
+                    for seg, val in raw_targets.items()}
 
     st.markdown("---")
 
@@ -794,29 +815,37 @@ elif page == "🎯 Capital Allocation Strategy":
             "Segment": ORDER * 2,
             "Metric": ["Exposure %"] * 4 + ["Loss Contribution %"] * 4,
             "Value": ([r["exp_pct"] for r in rows] + [r["loss_pct"] for r in rows])})
-        exp_loss_data["Segment"] = pd.Categorical(exp_loss_data["Segment"], categories=ORDER, ordered=True)
+        exp_loss_data["Segment"] = pd.Categorical(
+            exp_loss_data["Segment"], categories=ORDER, ordered=True)
         fig1 = px.bar(exp_loss_data, x="Segment", y="Value", color="Metric",
             barmode="group", text="Value",
-            color_discrete_map={"Exposure %": "#00B4D8", "Loss Contribution %": "#E63946"},
+            color_discrete_map={"Exposure %": "#00B4D8",
+                                "Loss Contribution %": "#E63946"},
             category_orders={"Segment": ORDER})
         fig1.update_traces(texttemplate="%{text}%", textposition="outside",
             textfont=dict(size=14), cliponaxis=False)
         fig1.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
             yaxis_title="Percentage (%)",
-            yaxis=dict(gridcolor="#1f2630", range=[0, exp_loss_data["Value"].max() * 1.3]),
+            yaxis=dict(gridcolor="#1f2630",
+                range=[0, exp_loss_data["Value"].max() * 1.3]),
             bargap=0.2, bargroupgap=0.05,
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            legend=dict(orientation="h", yanchor="bottom", y=1.02,
+                xanchor="right", x=1),
             margin=dict(t=40, b=40, l=10, r=10), height=480)
         st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
     with col2:
         chart_header("Recommended Portfolio Reallocation")
-        max_alloc = max(max(r["exp_pct"] for r in rows), max(target_alloc[seg] for seg in ORDER))
+        max_alloc = max(
+            max(r["exp_pct"] for r in rows),
+            max(target_alloc[seg] for seg in ORDER))
         alloc_df = pd.DataFrame({"Segment": ORDER,
             "Current %": [r["exp_pct"] for r in rows],
-            "Target %": [target_alloc[seg] for seg in ORDER]})
+            "Target %":  [target_alloc[seg] for seg in ORDER]})
         alloc_melted = alloc_df.melt(id_vars="Segment",
-            value_vars=["Current %", "Target %"], var_name="Type", value_name="Value")
-        alloc_melted["Segment"] = pd.Categorical(alloc_melted["Segment"], categories=ORDER, ordered=True)
+            value_vars=["Current %", "Target %"],
+            var_name="Type", value_name="Value")
+        alloc_melted["Segment"] = pd.Categorical(
+            alloc_melted["Segment"], categories=ORDER, ordered=True)
         fig2 = px.bar(alloc_melted, y="Segment", x="Value", color="Type",
             barmode="group", text="Value", orientation="h",
             color_discrete_map={"Current %": "#FFB703", "Target %": "#00B4D8"},
@@ -827,7 +856,8 @@ elif page == "🎯 Capital Allocation Strategy":
             xaxis_title="Allocation (%)",
             xaxis=dict(gridcolor="#1f2630", range=[0, max_alloc * 1.3]),
             bargap=0.2, bargroupgap=0.1,
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            legend=dict(orientation="h", yanchor="bottom", y=1.02,
+                xanchor="right", x=1),
             margin=dict(t=40, b=40, l=10, r=80), height=480)
         st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
@@ -844,14 +874,42 @@ elif page == "📉 Stress Testing & Scenarios":
     st.markdown("---")
 
     insight_box(
-        "Stress testing answers one question: how bad can it get? "
-        "A PD multiplier simulates recession conditions by scaling up each segment's default rate. "
-        "PRIME is the most resilient — its low base default rate means even a severe shock "
-        "causes less absolute damage than the same shock applied to HIGH-RISK.")
+        "Stress testing answers: how bad can it get? "
+        "Each scenario multiplies every segment's actual default rate by a stress factor — "
+        "simulating how losses would grow if economic conditions deteriorated. "
+        "All base default rates, exposure amounts and LGD come directly from the data. "
+        "Nothing is assumed — only the PD multiplier changes per scenario.")
 
-    sub_caption(
-        "📌 All base figures below come from the Executive Overview. "
-        "EL = Exposure × Default Rate × LGD.")
+    # ── Data-driven stress explanation ──
+    st.markdown("""
+        <div style="background:#1a1f2e; border:1px solid #2d3447; border-radius:8px;
+        padding:18px 22px; margin-bottom:20px;">
+            <p style="color:#00B4D8; font-size:15px; font-weight:700; margin:0 0 10px 0;">
+            How Each Scenario Works — Fully Data Driven</p>
+            <p style="color:#cccccc; font-size:15px; margin:0 0 8px 0; line-height:1.7;">
+            <b style="color:white;">Formula:</b>
+            Expected Loss = Segment Exposure × Stressed Default Rate × LGD</p>
+            <p style="color:#cccccc; font-size:15px; margin:0 0 8px 0; line-height:1.7;">
+            <b style="color:white;">Base Default Rates</b> come directly from the data —
+            exactly as shown in the Segment Summary table on Page 1.</p>
+            <p style="color:#cccccc; font-size:15px; margin:0 0 8px 0; line-height:1.7;">
+            <b style="color:white;">Exposure amounts</b> come directly from the data —
+            sum of loan_amnt per segment.</p>
+            <p style="color:#cccccc; font-size:15px; margin:0 0 8px 0; line-height:1.7;">
+            <b style="color:white;">LGD</b> is set by you via the sidebar slider —
+            currently {LGD_PCT}%. This is the only non-data input.</p>
+            <p style="color:#cccccc; font-size:15px; margin:0 0 4px 0; line-height:1.7;">
+            <b style="color:white;">Stress multipliers:</b></p>
+            <p style="color:#aaaaaa; font-size:14px; margin:0 0 3px 16px;">
+            • Base Case: PD × 1.00 — no change, actual data as-is</p>
+            <p style="color:#aaaaaa; font-size:14px; margin:0 0 3px 16px;">
+            • Mild Recession: PD × 1.25 — 25% more borrowers default than historically observed</p>
+            <p style="color:#aaaaaa; font-size:14px; margin:0 0 3px 16px;">
+            • Severe Recession: PD × 1.50 — 50% more defaults, equivalent to a moderate downturn</p>
+            <p style="color:#aaaaaa; font-size:14px; margin:0 0 0 16px;">
+            • Extreme Stress: PD × 1.75 — 75% more defaults, equivalent to a severe financial crisis</p>
+        </div>
+    """.replace("{LGD_PCT}", str(int(LGD*100))), unsafe_allow_html=True)
 
     base_rows = []
     for r in anchor_rows:
@@ -867,8 +925,10 @@ elif page == "📉 Stress Testing & Scenarios":
         "Base Case (No Stress)", "Mild Recession (+25% PD)",
         "Severe Recession (+50% PD)", "Extreme Stress (+75% PD)"], index=0)
     multiplier_map = {
-        "Base Case (No Stress)": 1.00, "Mild Recession (+25% PD)": 1.25,
-        "Severe Recession (+50% PD)": 1.50, "Extreme Stress (+75% PD)": 1.75}
+        "Base Case (No Stress)": 1.00,
+        "Mild Recession (+25% PD)": 1.25,
+        "Severe Recession (+50% PD)": 1.50,
+        "Extreme Stress (+75% PD)": 1.75}
     pd_multiplier = multiplier_map[scenario]
 
     stress_rows = []
@@ -887,7 +947,8 @@ elif page == "📉 Stress Testing & Scenarios":
     base_total_el     = round(sum(r["base_el"]     for r in stress_rows), 2)
     stressed_total_el = round(sum(r["stressed_el"] for r in stress_rows), 2)
     el_increase       = round(stressed_total_el - base_total_el, 2)
-    el_increase_pct   = round((el_increase / base_total_el) * 100, 1) if base_total_el > 0 else 0
+    el_increase_pct   = round(
+        (el_increase / base_total_el) * 100, 1) if base_total_el > 0 else 0
 
     sc1, sc2, sc3 = st.columns(3)
     sc1.metric("Base Expected Loss", f"${base_total_el} Mn")
@@ -899,18 +960,24 @@ elif page == "📉 Stress Testing & Scenarios":
     st.markdown("")
     st.markdown(
         "<p style='color:#aaaaaa; font-size:14px; margin-bottom:8px;'>"
-        "Full computation chain — Exposure × Default Rate × LGD = Expected Loss.</p>",
+        "Full computation chain per segment — "
+        "Exposure (from data) × Stressed Default Rate × LGD (slider) = Expected Loss.</p>",
         unsafe_allow_html=True)
 
     el_hdr = (
         '<div style="overflow-x:auto; margin-bottom:20px;">'
         '<table style="width:100%; border-collapse:collapse; font-size:15px;">'
         '<thead><tr style="background:#1a1f2e; color:#aaaaaa; font-size:14px;">'
-        '<th style="padding:13px 16px; text-align:left; white-space:nowrap; border-bottom:1px solid #2d3447;">Segment</th>'
-        '<th style="padding:13px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">Exposure ($ Mn)</th>'
-        '<th style="padding:13px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">Base Default Rate</th>'
-        '<th style="padding:13px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">LGD</th>'
-        '<th style="padding:13px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">Base Expected Loss ($ Mn)</th>'
+        '<th style="padding:13px 16px; text-align:left; white-space:nowrap; '
+        'border-bottom:1px solid #2d3447;">Segment</th>'
+        '<th style="padding:13px 16px; text-align:right; white-space:nowrap; '
+        'border-bottom:1px solid #2d3447;">Exposure ($ Mn)</th>'
+        '<th style="padding:13px 16px; text-align:right; white-space:nowrap; '
+        'border-bottom:1px solid #2d3447;">Base Default Rate</th>'
+        '<th style="padding:13px 16px; text-align:right; white-space:nowrap; '
+        'border-bottom:1px solid #2d3447;">LGD</th>'
+        '<th style="padding:13px 16px; text-align:right; white-space:nowrap; '
+        'border-bottom:1px solid #2d3447;">Base Expected Loss ($ Mn)</th>'
         '</tr></thead><tbody>'
     )
     el_body = ""
@@ -918,34 +985,49 @@ elif page == "📉 Stress Testing & Scenarios":
         exp_mn = round(r["exp"] / 1_000_000, 2)
         el_body += (
             f'<tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">'
-            f'<td style="padding:13px 16px; color:{seg_colors[r["seg"]]}; font-weight:700; white-space:nowrap;">{r["seg"]}</td>'
-            f'<td style="padding:13px 16px; text-align:right; color:#cccccc; white-space:nowrap;">${exp_mn} Mn</td>'
-            f'<td style="padding:13px 16px; text-align:right; color:#cccccc; white-space:nowrap;">{r["base_dr"]}%</td>'
-            f'<td style="padding:13px 16px; text-align:right; color:#cccccc; white-space:nowrap;">{int(LGD*100)}%</td>'
-            f'<td style="padding:13px 16px; text-align:right; color:#00B4D8; font-weight:700; white-space:nowrap;">${r["base_el"]} Mn</td>'
+            f'<td style="padding:13px 16px; color:{seg_colors[r["seg"]]}; '
+            f'font-weight:700; white-space:nowrap;">{r["seg"]}</td>'
+            f'<td style="padding:13px 16px; text-align:right; color:#cccccc; '
+            f'white-space:nowrap;">${exp_mn} Mn</td>'
+            f'<td style="padding:13px 16px; text-align:right; color:#cccccc; '
+            f'white-space:nowrap;">{r["base_dr"]}%</td>'
+            f'<td style="padding:13px 16px; text-align:right; color:#cccccc; '
+            f'white-space:nowrap;">{int(LGD*100)}%</td>'
+            f'<td style="padding:13px 16px; text-align:right; color:#00B4D8; '
+            f'font-weight:700; white-space:nowrap;">${r["base_el"]} Mn</td>'
             f'</tr>'
         )
     total_exp_mn = round(sum(r["exp"] for r in stress_rows) / 1_000_000, 2)
     el_body += (
         f'<tr style="background:#1a1f2e;">'
         f'<td style="padding:13px 16px; color:#ffffff; font-weight:700;">Total</td>'
-        f'<td style="padding:13px 16px; text-align:right; color:#ffffff; font-weight:700;">${total_exp_mn} Mn</td>'
+        f'<td style="padding:13px 16px; text-align:right; color:#ffffff; '
+        f'font-weight:700;">${total_exp_mn} Mn</td>'
         f'<td style="padding:13px 16px; text-align:right; color:#aaaaaa;">—</td>'
-        f'<td style="padding:13px 16px; text-align:right; color:#aaaaaa;">{int(LGD*100)}%</td>'
-        f'<td style="padding:13px 16px; text-align:right; color:#ffffff; font-weight:700;">${base_total_el} Mn</td>'
+        f'<td style="padding:13px 16px; text-align:right; color:#aaaaaa;">'
+        f'{int(LGD*100)}%</td>'
+        f'<td style="padding:13px 16px; text-align:right; color:#ffffff; '
+        f'font-weight:700;">${base_total_el} Mn</td>'
         f'</tr>'
     )
     st.markdown(el_hdr + el_body + "</tbody></table></div>", unsafe_allow_html=True)
 
     s_header = (
-        '<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:15px;">'
+        '<div style="overflow-x:auto;"><table style="width:100%; '
+        'border-collapse:collapse; font-size:15px;">'
         '<thead><tr style="background:#1a1f2e; color:#aaaaaa; font-size:14px;">'
-        '<th style="padding:14px 16px; text-align:left; white-space:nowrap; border-bottom:1px solid #2d3447;">Segment</th>'
-        '<th style="padding:14px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">Base Default Rate</th>'
-        '<th style="padding:14px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">Stressed Default Rate</th>'
-        '<th style="padding:14px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">Base Exp. Loss</th>'
-        '<th style="padding:14px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">Stressed Exp. Loss</th>'
-        '<th style="padding:14px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">Additional Loss</th>'
+        '<th style="padding:14px 16px; text-align:left; white-space:nowrap; '
+        'border-bottom:1px solid #2d3447;">Segment</th>'
+        '<th style="padding:14px 16px; text-align:right; white-space:nowrap; '
+        'border-bottom:1px solid #2d3447;">Base Default Rate</th>'
+        '<th style="padding:14px 16px; text-align:right; white-space:nowrap; '
+        'border-bottom:1px solid #2d3447;">Stressed Default Rate</th>'
+        '<th style="padding:14px 16px; text-align:right; white-space:nowrap; '
+        'border-bottom:1px solid #2d3447;">Base Exp. Loss</th>'
+        '<th style="padding:14px 16px; text-align:right; white-space:nowrap; '
+        'border-bottom:1px solid #2d3447;">Stressed Exp. Loss</th>'
+        '<th style="padding:14px 16px; text-align:right; white-space:nowrap; '
+        'border-bottom:1px solid #2d3447;">Additional Loss</th>'
         '</tr></thead><tbody>'
     )
     s_body = ""
@@ -953,12 +1035,18 @@ elif page == "📉 Stress Testing & Scenarios":
         change_color = "#E63946" if sr["el_change"] > 0 else "#00B4D8"
         s_body += (
             '<tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">'
-            '<td style="padding:13px 16px; color:white; font-weight:600; white-space:nowrap;">' + sr["seg"] + '</td>'
-            '<td style="padding:13px 16px; text-align:right; color:#cccccc; white-space:nowrap;">' + f"{sr['base_dr']}%" + '</td>'
-            '<td style="padding:13px 16px; text-align:right; color:#FFB703; white-space:nowrap;">' + f"{sr['stressed_dr']}%" + '</td>'
-            '<td style="padding:13px 16px; text-align:right; color:#cccccc; white-space:nowrap;">$' + f"{sr['base_el']} Mn" + '</td>'
-            '<td style="padding:13px 16px; text-align:right; color:#FFB703; white-space:nowrap;">$' + f"{sr['stressed_el']} Mn" + '</td>'
-            '<td style="padding:13px 16px; text-align:right; white-space:nowrap; color:' + change_color + '; font-weight:700;">+$' + f"{sr['el_change']} Mn" + '</td>'
+            '<td style="padding:13px 16px; color:white; font-weight:600; '
+            'white-space:nowrap;">' + sr["seg"] + '</td>'
+            '<td style="padding:13px 16px; text-align:right; color:#cccccc; '
+            'white-space:nowrap;">' + f"{sr['base_dr']}%" + '</td>'
+            '<td style="padding:13px 16px; text-align:right; color:#FFB703; '
+            'white-space:nowrap;">' + f"{sr['stressed_dr']}%" + '</td>'
+            '<td style="padding:13px 16px; text-align:right; color:#cccccc; '
+            'white-space:nowrap;">$' + f"{sr['base_el']} Mn" + '</td>'
+            '<td style="padding:13px 16px; text-align:right; color:#FFB703; '
+            'white-space:nowrap;">$' + f"{sr['stressed_el']} Mn" + '</td>'
+            '<td style="padding:13px 16px; text-align:right; white-space:nowrap; color:'
+            + change_color + '; font-weight:700;">+$' + f"{sr['el_change']} Mn" + '</td>'
             '</tr>'
         )
     st.markdown(s_header + s_body + "</tbody></table></div>", unsafe_allow_html=True)
@@ -973,9 +1061,11 @@ elif page == "📉 Stress Testing & Scenarios":
         chart_header("Expected Loss: Base vs Stressed")
         el_compare = pd.DataFrame({"Segment": ORDER * 2,
             "Scenario": ["Base Case"] * 4 + [scenario] * 4,
-            "Expected Loss ($ Mn)": ([r["base_el"] for r in stress_rows] +
-                                     [r["stressed_el"] for r in stress_rows])})
-        el_compare["Segment"] = pd.Categorical(el_compare["Segment"], categories=ORDER, ordered=True)
+            "Expected Loss ($ Mn)": (
+                [r["base_el"] for r in stress_rows] +
+                [r["stressed_el"] for r in stress_rows])})
+        el_compare["Segment"] = pd.Categorical(
+            el_compare["Segment"], categories=ORDER, ordered=True)
         fig1 = px.bar(el_compare, x="Segment", y="Expected Loss ($ Mn)",
             color="Scenario", barmode="group", text="Expected Loss ($ Mn)",
             color_discrete_map={"Base Case": "#00B4D8", scenario: "#E63946"},
@@ -983,18 +1073,22 @@ elif page == "📉 Stress Testing & Scenarios":
         fig1.update_traces(texttemplate="$%{text} Mn", textposition="outside",
             textfont=dict(size=13), cliponaxis=False)
         fig1.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-            yaxis=dict(gridcolor="#1f2630", range=[0, el_compare["Expected Loss ($ Mn)"].max() * 1.3]),
+            yaxis=dict(gridcolor="#1f2630",
+                range=[0, el_compare["Expected Loss ($ Mn)"].max() * 1.3]),
             bargap=0.2, bargroupgap=0.05,
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            legend=dict(orientation="h", yanchor="bottom", y=1.02,
+                xanchor="right", x=1),
             margin=dict(t=40, b=10, l=10, r=10), height=420)
         st.plotly_chart(fig1, use_container_width=True, config=CHART_CONFIG)
     with col2:
         chart_header("Default Rate: Base vs Stressed")
         dr_compare = pd.DataFrame({"Segment": ORDER * 2,
             "Scenario": ["Base Case"] * 4 + [scenario] * 4,
-            "Default Rate (%)": ([r["base_dr"] for r in stress_rows] +
-                                 [r["stressed_dr"] for r in stress_rows])})
-        dr_compare["Segment"] = pd.Categorical(dr_compare["Segment"], categories=ORDER, ordered=True)
+            "Default Rate (%)": (
+                [r["base_dr"] for r in stress_rows] +
+                [r["stressed_dr"] for r in stress_rows])})
+        dr_compare["Segment"] = pd.Categorical(
+            dr_compare["Segment"], categories=ORDER, ordered=True)
         fig2 = px.bar(dr_compare, x="Segment", y="Default Rate (%)",
             color="Scenario", barmode="group", text="Default Rate (%)",
             color_discrete_map={"Base Case": "#00B4D8", scenario: "#E63946"},
@@ -1002,9 +1096,11 @@ elif page == "📉 Stress Testing & Scenarios":
         fig2.update_traces(texttemplate="%{text}%", textposition="outside",
             textfont=dict(size=13), cliponaxis=False)
         fig2.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
-            yaxis=dict(gridcolor="#1f2630", range=[0, dr_compare["Default Rate (%)"].max() * 1.3]),
+            yaxis=dict(gridcolor="#1f2630",
+                range=[0, dr_compare["Default Rate (%)"].max() * 1.3]),
             bargap=0.2, bargroupgap=0.05,
-            legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+            legend=dict(orientation="h", yanchor="bottom", y=1.02,
+                xanchor="right", x=1),
             margin=dict(t=40, b=10, l=10, r=10), height=420)
         st.plotly_chart(fig2, use_container_width=True, config=CHART_CONFIG)
 
@@ -1014,12 +1110,13 @@ elif page == "📉 Stress Testing & Scenarios":
         "Simulates future lending decisions — not movement of existing loans. "
         "Redirects future originations from SUBPRIME and HIGH-RISK towards PRIME "
         "while keeping total portfolio size constant. "
-        "The split between SUBPRIME and HIGH-RISK is calculated from their actual exposure weights — "
+        "The SUBPRIME/HIGH-RISK split is calculated from their actual exposure weights — "
         "not hardcoded.")
     st.markdown("")
 
     shift_pct = st.slider(
-        "Capital Reallocation (% of total portfolio redirected from SUBPRIME + HIGH-RISK → PRIME)",
+        "Capital Reallocation "
+        "(% of total portfolio redirected from SUBPRIME + HIGH-RISK → PRIME)",
         min_value=0, max_value=15, value=5, step=1)
 
     prime_data = df[df["segment"] == "PRIME"]
@@ -1087,7 +1184,7 @@ elif page == "📉 Stress Testing & Scenarios":
         f"Reallocation sourced proportionally — "
         f"<b style='color:#FB8500'>{round(sub_weight*100,1)}% from SUBPRIME</b> and "
         f"<b style='color:#E63946'>{round(high_weight*100,1)}% from HIGH-RISK</b>, "
-        f"based on current exposure weights.</p>",
+        f"based on their actual exposure share within the risky pool.</p>",
         unsafe_allow_html=True)
 
     st.markdown("---")
@@ -1103,7 +1200,8 @@ elif page == "📉 Stress Testing & Scenarios":
             round(near_exp_new  / 1_000_000, 2),
             round(sub_exp_new   / 1_000_000, 2),
             round(high_exp_new  / 1_000_000, 2)]})
-    realloc_data["Segment"] = pd.Categorical(realloc_data["Segment"], categories=ORDER, ordered=True)
+    realloc_data["Segment"] = pd.Categorical(
+        realloc_data["Segment"], categories=ORDER, ordered=True)
     fig_sim = px.bar(realloc_data, x="Segment", y="Exposure ($ Mn)", color="Type",
         barmode="group", text="Exposure ($ Mn)",
         color_discrete_map={"Current": "#FFB703", "Simulated": "#00B4D8"},
@@ -1112,9 +1210,11 @@ elif page == "📉 Stress Testing & Scenarios":
         textfont=dict(size=13), cliponaxis=False)
     fig_sim.update_layout(paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
         yaxis_title="Exposure ($ Mn)",
-        yaxis=dict(gridcolor="#1f2630", range=[0, realloc_data["Exposure ($ Mn)"].max() * 1.3]),
+        yaxis=dict(gridcolor="#1f2630",
+            range=[0, realloc_data["Exposure ($ Mn)"].max() * 1.3]),
         bargap=0.2, bargroupgap=0.05,
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02,
+            xanchor="right", x=1),
         margin=dict(t=40, b=10, l=10, r=10))
     st.plotly_chart(fig_sim, use_container_width=True, config=CHART_CONFIG)
 
@@ -1132,8 +1232,10 @@ elif page == "📋 Management Recommendations":
 
     insight_box(
         "This section consolidates findings from the full analysis into four clear actions. "
-        "Segments where loss contribution far exceeds exposure share are destroying capital — exit or reduce. "
-        "Segments where loss contribution is well below exposure share are underleveraged — grow them.")
+        "Segments where loss contribution far exceeds exposure share are destroying capital — "
+        "exit or reduce. "
+        "Segments where loss contribution is well below exposure share are underleveraged — "
+        "grow them.")
 
     total_exposure = df["loan_amnt"].sum()
     total_loss_val = (df["loan_status"] * df["loan_amnt"]).sum()
@@ -1160,94 +1262,133 @@ elif page == "📋 Management Recommendations":
         elif lp < ep*0.8: rec_map[seg] = ("Grow",     "#00B4D8")
         else:             rec_map[seg] = ("Maintain", "#FFB703")
 
-    raw_targets  = {seg: seg_stats[seg]["exp_pct"] * alloc_multiplier[rec_map[seg][0]] for seg in ORDER}
+    raw_targets  = {seg: seg_stats[seg]["exp_pct"] *
+                    alloc_multiplier[rec_map[seg][0]] for seg in ORDER}
     total_raw    = sum(raw_targets.values())
-    target_alloc = {seg: round(val / total_raw * 100, 1) for seg, val in raw_targets.items()}
+    target_alloc = {seg: round(val / total_raw * 100, 1)
+                    for seg, val in raw_targets.items()}
 
-    worst_seg          = max(ORDER, key=lambda s: seg_stats[s]["loss_pct"] / seg_stats[s]["exp_pct"])
-    best_yield_seg     = max(ORDER, key=lambda s: seg_stats[s]["net_yield"])
-    high_risk_loss_gap = round(seg_stats["HIGH-RISK"]["loss_pct"] - seg_stats["HIGH-RISK"]["exp_pct"], 1)
+    worst_seg = max(
+        ORDER, key=lambda s: seg_stats[s]["loss_pct"] / seg_stats[s]["exp_pct"])
+    best_yield_seg = max(ORDER, key=lambda s: seg_stats[s]["net_yield"])
+    high_risk_loss_gap = round(
+        seg_stats["HIGH-RISK"]["loss_pct"] - seg_stats["HIGH-RISK"]["exp_pct"], 1)
 
     st.subheader("Key Findings")
     metric_row(
-        ["Portfolio Default Rate", "Highest Loss Contributor", "Best Net Yield Segment", "HIGH-RISK Loss Excess"],
+        ["Portfolio Default Rate", "Highest Loss Contributor",
+         "Best Net Yield Segment", "HIGH-RISK Loss Excess"],
         [f"{portfolio_dr}%", worst_seg, best_yield_seg, f"+{high_risk_loss_gap}%"]
     )
 
     st.markdown("---")
     st.subheader("Analysis Summary")
 
-    high_exp    = seg_stats["HIGH-RISK"]["exp_pct"]
-    high_loss   = seg_stats["HIGH-RISK"]["loss_pct"]
-    high_ratio  = round(high_loss / high_exp, 1)
-    prime_dr    = seg_stats["PRIME"]["dr"]
-    prime_yield = seg_stats["PRIME"]["net_yield"]
-    sub_exit_pct = round(seg_stats["SUBPRIME"]["exp_pct"] * 0.5 + seg_stats["HIGH-RISK"]["exp_pct"], 1)
+    high_exp     = seg_stats["HIGH-RISK"]["exp_pct"]
+    high_loss    = seg_stats["HIGH-RISK"]["loss_pct"]
+    high_ratio   = round(high_loss / high_exp, 1)
+    prime_dr     = seg_stats["PRIME"]["dr"]
+    prime_yield  = seg_stats["PRIME"]["net_yield"]
+    sub_exit_pct = round(
+        seg_stats["SUBPRIME"]["exp_pct"] * 0.5 + seg_stats["HIGH-RISK"]["exp_pct"], 1)
 
     findings = [
-        f"The portfolio carries a <b style='color:#FFB703'>{portfolio_dr}% overall default rate</b>. "
-        f"The dominant risk predictor — identified through default rate analysis — is loan-to-income ratio, "
-        f"with a 62-point spread between the safest and riskiest borrowers.",
-        f"<b style='color:#E63946'>HIGH-RISK segment</b> represents only {high_exp}% of exposure "
-        f"but contributes {high_loss}% of total losses — a {high_ratio}x loss-to-exposure ratio. "
-        f"This is the clearest case of capital misallocation in the portfolio.",
-        f"<b style='color:#00B4D8'>PRIME segment</b> holds {seg_stats['PRIME']['exp_pct']}% of exposure "
-        f"with a {prime_dr}% default rate and net yield of {prime_yield}% after expected loss. "
-        f"It is the most capital-efficient tier and the primary growth target.",
-        f"Risk-adjusted net yield turns negative from Grade D onwards, confirming that interest rate pricing "
-        f"does not fully compensate for default losses in the lower credit grades at a {int(LGD*100)}% LGD assumption.",
-        f"The recommended reallocation — reducing SUBPRIME and exiting HIGH-RISK — frees approximately "
-        f"{sub_exit_pct}% of portfolio capital for redeployment into PRIME, improving both default rate "
-        f"and expected loss without changing total book size."
+        f"The portfolio carries a <b style='color:#FFB703'>{portfolio_dr}% overall "
+        f"default rate</b>. The dominant risk predictor — identified through default "
+        f"rate analysis across all 32,572 borrowers — is loan-to-income ratio, "
+        f"with a 62-point default rate spread between the safest and riskiest borrowers.",
+
+        f"<b style='color:#E63946'>HIGH-RISK segment</b> holds only {high_exp}% of "
+        f"exposure but contributes {high_loss}% of total losses — a {high_ratio}x "
+        f"loss-to-exposure ratio. Every dollar deployed here generates disproportionate "
+        f"losses. This is the clearest case of capital misallocation in the portfolio.",
+
+        f"<b style='color:#00B4D8'>PRIME segment</b> holds {seg_stats['PRIME']['exp_pct']}% "
+        f"of exposure with a {prime_dr}% default rate and net yield of {prime_yield}% "
+        f"after expected loss. It is the most capital-efficient tier and the primary "
+        f"growth target.",
+
+        f"Risk-adjusted net yield turns negative from Grade D onwards — confirmed directly "
+        f"from the data. The lender's interest rate pricing does not compensate for actual "
+        f"default losses in the lower grades at a {int(LGD*100)}% LGD.",
+
+        f"The recommended reallocation — reducing SUBPRIME exposure by 50% and fully "
+        f"exiting HIGH-RISK — frees approximately {sub_exit_pct}% of portfolio capital "
+        f"for redeployment into PRIME, improving both default rate and expected loss "
+        f"without changing total book size."
     ]
 
-    finding_html = '<div style="background:#1a1f2e; border-radius:10px; padding:24px 28px; border:1px solid #2d3447;">'
+    finding_html = (
+        '<div style="background:#1a1f2e; border-radius:10px; '
+        'padding:24px 28px; border:1px solid #2d3447;">')
     for f in findings:
-        finding_html += f'<p style="color:#cccccc; font-size:16px; margin-bottom:14px; line-height:1.7;">&#8594; {f}</p>'
+        finding_html += (
+            f'<p style="color:#cccccc; font-size:16px; margin-bottom:14px; '
+            f'line-height:1.7;">&#8594; {f}</p>')
     finding_html += '</div>'
     st.markdown(finding_html, unsafe_allow_html=True)
 
     st.markdown("---")
     st.subheader("Recommended Actions")
     sub_caption(
-        "Logic: loss contribution > 2× exposure share → Exit | "
+        "Logic — all thresholds applied to actual data: "
+        "loss > 2× exposure share → Exit | "
         "loss > exposure share → Tighten | "
         "loss < 80% of exposure share → Grow | otherwise → Maintain")
 
     actions = [
         ("PRIME", rec_map["PRIME"][0], rec_map["PRIME"][1],
-         f"Grow from {seg_stats['PRIME']['exp_pct']}% to {target_alloc['PRIME']}% of portfolio",
-         f"Highest capital efficiency. {seg_stats['PRIME']['dr']}% default rate. Loss contribution well below exposure share."),
+         f"Grow from {seg_stats['PRIME']['exp_pct']}% to "
+         f"{target_alloc['PRIME']}% of portfolio",
+         f"Highest capital efficiency. {seg_stats['PRIME']['dr']}% default rate. "
+         f"Loss contribution well below exposure share."),
         ("NEAR-PRIME", rec_map["NEAR-PRIME"][0], rec_map["NEAR-PRIME"][1],
          "Maintain with stricter underwriting on LTI > 25%",
-         f"{seg_stats['NEAR-PRIME']['dr']}% default rate. Loss contribution of {seg_stats['NEAR-PRIME']['loss_pct']}% slightly exceeds exposure share of {seg_stats['NEAR-PRIME']['exp_pct']}%."),
+         f"{seg_stats['NEAR-PRIME']['dr']}% default rate. Loss contribution of "
+         f"{seg_stats['NEAR-PRIME']['loss_pct']}% slightly exceeds exposure share "
+         f"of {seg_stats['NEAR-PRIME']['exp_pct']}%."),
         ("SUBPRIME", rec_map["SUBPRIME"][0], rec_map["SUBPRIME"][1],
-         f"Reduce from {seg_stats['SUBPRIME']['exp_pct']}% to {target_alloc['SUBPRIME']}% of portfolio",
-         f"{seg_stats['SUBPRIME']['dr']}% default rate. Loss contribution significantly exceeds exposure share."),
+         f"Reduce from {seg_stats['SUBPRIME']['exp_pct']}% to "
+         f"{target_alloc['SUBPRIME']}% of portfolio",
+         f"{seg_stats['SUBPRIME']['dr']}% default rate. "
+         f"Loss contribution significantly exceeds exposure share."),
         ("HIGH-RISK", rec_map["HIGH-RISK"][0], rec_map["HIGH-RISK"][1],
          "Stop new originations. Wind down existing book.",
-         f"{seg_stats['HIGH-RISK']['dr']}% default rate. Generates {seg_stats['HIGH-RISK']['loss_pct']}% of losses on only {seg_stats['HIGH-RISK']['exp_pct']}% of exposure.")
+         f"{seg_stats['HIGH-RISK']['dr']}% default rate. Generates "
+         f"{seg_stats['HIGH-RISK']['loss_pct']}% of losses on only "
+         f"{seg_stats['HIGH-RISK']['exp_pct']}% of exposure.")
     ]
 
     a_header = (
-        '<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:15px;">'
+        '<div style="overflow-x:auto;"><table style="width:100%; '
+        'border-collapse:collapse; font-size:15px;">'
         '<thead><tr style="background:#1a1f2e; color:#aaaaaa; font-size:14px;">'
-        '<th style="padding:14px 16px; text-align:left; white-space:nowrap; border-bottom:1px solid #2d3447;">Segment</th>'
-        '<th style="padding:14px 16px; text-align:center; white-space:nowrap; border-bottom:1px solid #2d3447;">Action</th>'
-        '<th style="padding:14px 16px; text-align:left; white-space:nowrap; border-bottom:1px solid #2d3447;">What to Do</th>'
-        '<th style="padding:14px 16px; text-align:left; border-bottom:1px solid #2d3447;">Why</th>'
+        '<th style="padding:14px 16px; text-align:left; white-space:nowrap; '
+        'border-bottom:1px solid #2d3447;">Segment</th>'
+        '<th style="padding:14px 16px; text-align:center; white-space:nowrap; '
+        'border-bottom:1px solid #2d3447;">Action</th>'
+        '<th style="padding:14px 16px; text-align:left; white-space:nowrap; '
+        'border-bottom:1px solid #2d3447;">What to Do</th>'
+        '<th style="padding:14px 16px; text-align:left; '
+        'border-bottom:1px solid #2d3447;">Why</th>'
         '</tr></thead><tbody>'
     )
     a_body = ""
-    badge_style = "padding:4px 14px; border-radius:20px; font-weight:700; font-size:13px; white-space:nowrap;"
+    badge = ("padding:4px 14px; border-radius:20px; font-weight:700; "
+             "font-size:13px; white-space:nowrap;")
     for seg, rec, color, what, why in actions:
         a_body += (
             '<tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">'
-            '<td style="padding:13px 16px; color:white; font-weight:600; white-space:nowrap;">' + seg + '</td>'
+            '<td style="padding:13px 16px; color:white; font-weight:600; '
+            'white-space:nowrap;">' + seg + '</td>'
             '<td style="padding:13px 16px; text-align:center; white-space:nowrap;">'
-            '<span style="background-color:' + color + '33; color:' + color + '; border:1px solid ' + color + '; ' + badge_style + '">' + rec + '</span></td>'
-            '<td style="padding:13px 16px; color:#cccccc; white-space:nowrap;">' + what + '</td>'
-            '<td style="padding:13px 16px; color:#888888; font-size:14px;">' + why + '</td>'
+            '<span style="background-color:' + color + '33; color:' + color +
+            '; border:1px solid ' + color + '; ' + badge + '">' + rec +
+            '</span></td>'
+            '<td style="padding:13px 16px; color:#cccccc; white-space:nowrap;">'
+            + what + '</td>'
+            '<td style="padding:13px 16px; color:#888888; font-size:14px;">'
+            + why + '</td>'
             '</tr>'
         )
     st.markdown(a_header + a_body + "</tbody></table></div>", unsafe_allow_html=True)
@@ -1258,8 +1399,10 @@ elif page == "📋 Management Recommendations":
         "Current %": [seg_stats[seg]["exp_pct"] for seg in ORDER],
         "Target %":  [target_alloc[seg]         for seg in ORDER]})
     final_melted = final_alloc.melt(id_vars="Segment",
-        value_vars=["Current %", "Target %"], var_name="Type", value_name="Value")
-    final_melted["Segment"] = pd.Categorical(final_melted["Segment"], categories=ORDER, ordered=True)
+        value_vars=["Current %", "Target %"],
+        var_name="Type", value_name="Value")
+    final_melted["Segment"] = pd.Categorical(
+        final_melted["Segment"], categories=ORDER, ordered=True)
     max_val = final_melted["Value"].max()
     fig_final = px.bar(final_melted, y="Segment", x="Value", color="Type",
         barmode="group", text="Value", orientation="h",
@@ -1271,7 +1414,8 @@ elif page == "📋 Management Recommendations":
         xaxis_title="Allocation (%)",
         xaxis=dict(gridcolor="#1f2630", range=[0, max_val * 1.3]),
         bargap=0.2, bargroupgap=0.1,
-        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+        legend=dict(orientation="h", yanchor="bottom", y=1.02,
+            xanchor="right", x=1),
         margin=dict(t=40, b=10, l=80, r=80), height=350)
     st.plotly_chart(fig_final, use_container_width=True, config=CHART_CONFIG)
 
