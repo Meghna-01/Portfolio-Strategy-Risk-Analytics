@@ -15,7 +15,7 @@ st.markdown("""
     <style>
     /* ── Metric values ── */
     [data-testid="stMetricValue"] {
-        font-size: 28px;
+        font-size: 26px;
         font-weight: bold;
         color: #00B4D8;
     }
@@ -27,12 +27,14 @@ st.markdown("""
     /* ── Sidebar background ── */
     section[data-testid="stSidebar"] {
         background-color: #0d1117;
-        min-width: 310px !important;
-        max-width: 310px !important;
+    }
+
+    /* ── Sidebar inner width — does NOT block collapse ── */
+    section[data-testid="stSidebar"] > div:first-child {
         width: 310px !important;
     }
 
-    /* ── Kill the top empty space in sidebar ── */
+    /* ── Kill top empty space in sidebar ── */
     [data-testid="stSidebarContent"] {
         padding-top: 0.6rem !important;
     }
@@ -46,16 +48,13 @@ st.markdown("""
         margin-top: 0 !important;
         margin-bottom: 0.5rem !important;
         padding-top: 0 !important;
-        white-space: normal !important;
     }
 
-    /* ── Sidebar radio tab font — bigger, no wrap ── */
+    /* ── Sidebar radio labels — bigger font ── */
     [data-testid="stSidebar"] [data-testid="stRadio"] label p {
-        font-size: 14.5px !important;
+        font-size: 16px !important;
         font-weight: 500 !important;
         white-space: nowrap !important;
-        overflow: hidden !important;
-        text-overflow: ellipsis !important;
     }
 
     /* ── Selectbox ── */
@@ -68,7 +67,12 @@ st.markdown("""
     /* ── Remove top black space on main content ── */
     .block-container {
         padding-top: 1rem !important;
-        padding-bottom: 1rem !important;
+        padding-bottom: 4rem !important;
+    }
+
+    /* ── Global font base ── */
+    html, body, [class*="css"] {
+        font-size: 15px;
     }
 
     /* ── Responsive metric cards ── */
@@ -81,15 +85,15 @@ st.markdown("""
     .metric-card {
         background: #1a1f2e;
         border: 1px solid #2d3447;
-        padding: 16px 18px;
+        padding: 18px 20px;
         border-radius: 10px;
-        flex: 1 1 140px;
+        flex: 1 1 150px;
         min-width: 0;
         box-sizing: border-box;
     }
     .metric-card p.label {
         color: #aaaaaa;
-        font-size: 12px;
+        font-size: 13px;
         margin: 0 0 6px 0;
         white-space: nowrap;
         overflow: hidden;
@@ -97,12 +101,37 @@ st.markdown("""
     }
     .metric-card p.value {
         color: #00B4D8;
-        font-size: 18px;
+        font-size: 20px;
         font-weight: bold;
         margin: 0;
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+    }
+
+    /* ── Remove excess whitespace after charts ── */
+    .stPlotlyChart {
+        margin-bottom: 0 !important;
+        padding-bottom: 0 !important;
+    }
+
+    /* ── Fixed footer — always visible over sidebar and content ── */
+    .fixed-footer {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        z-index: 99999;
+        background: #0d1117;
+        border-top: 1px solid #2d3447;
+        padding: 8px 24px;
+        font-size: 13px;
+        color: #aaaaaa;
+        text-align: center;
+    }
+    .fixed-footer span {
+        color: #00B4D8;
+        font-weight: 600;
     }
 
     /* ── Mobile: 2-per-row cards ── */
@@ -112,7 +141,10 @@ st.markdown("""
             padding: 12px 14px;
         }
         .metric-card p.value {
-            font-size: 15px;
+            font-size: 17px;
+        }
+        .metric-card p.label {
+            font-size: 12px;
         }
         .block-container {
             padding-left: 0.8rem !important;
@@ -120,12 +152,20 @@ st.markdown("""
         }
     }
 
-    /* ── Remove excess whitespace after charts ── */
-    .stPlotlyChart {
-        margin-bottom: 0 !important;
-        padding-bottom: 0 !important;
+    /* ── Portrait phone: sidebar collapsed by default ── */
+    @media (max-width: 768px) and (orientation: portrait) {
+        section[data-testid="stSidebar"] {
+            display: none;
+        }
     }
     </style>
+""", unsafe_allow_html=True)
+
+# ── Persistent footer injected once ──
+st.markdown("""
+    <div class="fixed-footer">
+        Built by <span>Meghna</span>
+    </div>
 """, unsafe_allow_html=True)
 
 PALETTE = ["#00B4D8", "#FFB703", "#FB8500", "#E63946"]
@@ -145,9 +185,11 @@ page = st.sidebar.radio("", [
 ])
 st.sidebar.markdown("---")
 LGD = st.sidebar.slider("LGD Assumption (%)", min_value=20, max_value=100, value=60, step=5) / 100
-st.sidebar.caption(f"Loss Given Default = {int(LGD*100)}% (percentage of loan value not recovered after default)")
+st.sidebar.markdown(
+    f"<p style='color:#aaaaaa; font-size:13px; margin-top:4px;'>"
+    f"Loss Given Default = {int(LGD*100)}% (percentage of loan value not recovered after default)</p>",
+    unsafe_allow_html=True)
 st.sidebar.markdown("---")
-st.sidebar.caption("Built by Meghna")
 
 SCROLL_TOP = """
     <script>
@@ -155,11 +197,18 @@ SCROLL_TOP = """
     </script>
 """
 
+def sub_caption(text):
+    """Replaces st.caption() with readable 14px text."""
+    st.markdown(
+        f"<p style='color:#aaaaaa; font-size:14px; margin-top:-4px; margin-bottom:12px; "
+        f"line-height:1.6;'>{text}</p>",
+        unsafe_allow_html=True)
+
 def insight_box(text):
     st.markdown(f"""
         <div style="background:#1a1f2e; border-left:4px solid #00B4D8; border-radius:6px;
-        padding:16px 20px; margin-bottom:20px;">
-            <p style="color:#e0e0e0; font-size:15px; margin:0; line-height:1.7;">{text}</p>
+        padding:18px 22px; margin-bottom:20px;">
+            <p style="color:#e0e0e0; font-size:16px; margin:0; line-height:1.75;">{text}</p>
         </div>
     """, unsafe_allow_html=True)
 
@@ -170,7 +219,8 @@ def chart_header(text):
 
 def chart_caption(text):
     st.markdown(
-        f"<p style='text-align:center; color:#aaaaaa; font-size:13px; margin-top:0; margin-bottom:12px;'>{text}</p>",
+        f"<p style='text-align:center; color:#aaaaaa; font-size:14px; "
+        f"margin-top:0; margin-bottom:12px; line-height:1.6;'>{text}</p>",
         unsafe_allow_html=True)
 
 def col_divider():
@@ -225,42 +275,42 @@ def render_anchor_table(note=""):
     if note:
         caption_text = note
     st.markdown(
-        f"<p style='color:#aaaaaa; font-size:13px; margin-bottom:8px;'>{caption_text}</p>",
+        f"<p style='color:#aaaaaa; font-size:14px; margin-bottom:10px;'>{caption_text}</p>",
         unsafe_allow_html=True)
     hdr = (
         '<div style="overflow-x:auto; margin-bottom:20px;">'
-        '<table style="width:100%; border-collapse:collapse; font-size:14px;">'
-        '<thead><tr style="background:#1a1f2e; color:#aaaaaa; font-size:13px;">'
-        '<th style="padding:12px 16px; text-align:left; border-bottom:1px solid #2d3447; white-space:nowrap;">Segment</th>'
-        '<th style="padding:12px 16px; text-align:right; border-bottom:1px solid #2d3447; white-space:nowrap;">Borrowers</th>'
-        '<th style="padding:12px 16px; text-align:right; border-bottom:1px solid #2d3447; white-space:nowrap;">Total Exposure</th>'
-        '<th style="padding:12px 16px; text-align:right; border-bottom:1px solid #2d3447; white-space:nowrap;">Exposure %</th>'
-        '<th style="padding:12px 16px; text-align:right; border-bottom:1px solid #2d3447; white-space:nowrap;">Default Rate</th>'
-        '<th style="padding:12px 16px; text-align:right; border-bottom:1px solid #2d3447; white-space:nowrap;">Loss Contribution %</th>'
+        '<table style="width:100%; border-collapse:collapse; font-size:15px;">'
+        '<thead><tr style="background:#1a1f2e; color:#aaaaaa; font-size:14px;">'
+        '<th style="padding:13px 16px; text-align:left; border-bottom:1px solid #2d3447; white-space:nowrap;">Segment</th>'
+        '<th style="padding:13px 16px; text-align:right; border-bottom:1px solid #2d3447; white-space:nowrap;">Borrowers</th>'
+        '<th style="padding:13px 16px; text-align:right; border-bottom:1px solid #2d3447; white-space:nowrap;">Total Exposure</th>'
+        '<th style="padding:13px 16px; text-align:right; border-bottom:1px solid #2d3447; white-space:nowrap;">Exposure %</th>'
+        '<th style="padding:13px 16px; text-align:right; border-bottom:1px solid #2d3447; white-space:nowrap;">Default Rate</th>'
+        '<th style="padding:13px 16px; text-align:right; border-bottom:1px solid #2d3447; white-space:nowrap;">Loss Contribution %</th>'
         '</tr></thead><tbody>'
     )
     body = ""
     for r in anchor_rows:
         body += (
             f'<tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">'
-            f'<td style="padding:12px 16px; color:{seg_colors[r["seg"]]}; font-weight:700; white-space:nowrap;">{r["seg"]}</td>'
-            f'<td style="padding:12px 16px; text-align:right; color:#cccccc; white-space:nowrap;">{r["n"]:,}</td>'
-            f'<td style="padding:12px 16px; text-align:right; color:#cccccc; white-space:nowrap;">${r["exp_mn"]} Mn</td>'
-            f'<td style="padding:12px 16px; text-align:right; color:#cccccc; white-space:nowrap;">{r["exp_pct"]}%</td>'
-            f'<td style="padding:12px 16px; text-align:right; color:#cccccc; white-space:nowrap;">{r["dr"]}%</td>'
-            f'<td style="padding:12px 16px; text-align:right; color:#cccccc; white-space:nowrap;">{r["loss_pct"]}%</td>'
+            f'<td style="padding:13px 16px; color:{seg_colors[r["seg"]]}; font-weight:700; white-space:nowrap;">{r["seg"]}</td>'
+            f'<td style="padding:13px 16px; text-align:right; color:#cccccc; white-space:nowrap;">{r["n"]:,}</td>'
+            f'<td style="padding:13px 16px; text-align:right; color:#cccccc; white-space:nowrap;">${r["exp_mn"]} Mn</td>'
+            f'<td style="padding:13px 16px; text-align:right; color:#cccccc; white-space:nowrap;">{r["exp_pct"]}%</td>'
+            f'<td style="padding:13px 16px; text-align:right; color:#cccccc; white-space:nowrap;">{r["dr"]}%</td>'
+            f'<td style="padding:13px 16px; text-align:right; color:#cccccc; white-space:nowrap;">{r["loss_pct"]}%</td>'
             f'</tr>'
         )
     total_exp_mn = round(total_exposure_all / 1_000_000, 2)
     total_borrowers = len(df)
     body += (
         f'<tr style="background:#1a1f2e;">'
-        f'<td style="padding:12px 16px; color:#ffffff; font-weight:700; white-space:nowrap;">Total</td>'
-        f'<td style="padding:12px 16px; text-align:right; color:#ffffff; font-weight:700; white-space:nowrap;">{total_borrowers:,}</td>'
-        f'<td style="padding:12px 16px; text-align:right; color:#ffffff; font-weight:700; white-space:nowrap;">${total_exp_mn} Mn</td>'
-        f'<td style="padding:12px 16px; text-align:right; color:#ffffff; font-weight:700; white-space:nowrap;">100%</td>'
-        f'<td style="padding:12px 16px; text-align:right; color:#aaaaaa; white-space:nowrap;">—</td>'
-        f'<td style="padding:12px 16px; text-align:right; color:#ffffff; font-weight:700; white-space:nowrap;">100%</td>'
+        f'<td style="padding:13px 16px; color:#ffffff; font-weight:700; white-space:nowrap;">Total</td>'
+        f'<td style="padding:13px 16px; text-align:right; color:#ffffff; font-weight:700; white-space:nowrap;">{total_borrowers:,}</td>'
+        f'<td style="padding:13px 16px; text-align:right; color:#ffffff; font-weight:700; white-space:nowrap;">${total_exp_mn} Mn</td>'
+        f'<td style="padding:13px 16px; text-align:right; color:#ffffff; font-weight:700; white-space:nowrap;">100%</td>'
+        f'<td style="padding:13px 16px; text-align:right; color:#aaaaaa; white-space:nowrap;">—</td>'
+        f'<td style="padding:13px 16px; text-align:right; color:#ffffff; font-weight:700; white-space:nowrap;">100%</td>'
         f'</tr>'
     )
     st.markdown(hdr + body + "</tbody></table></div>", unsafe_allow_html=True)
@@ -272,22 +322,22 @@ if page == "📊 Executive Overview":
     components.html(SCROLL_TOP, height=0)
 
     st.title("📊 Portfolio Strategy & Risk Analytics")
-    st.caption("Executive Overview — Portfolio Health & Risk Snapshot")
+    sub_caption("Executive Overview — Portfolio Health & Risk Snapshot")
     st.markdown("---")
 
     st.subheader("Business Objective")
     st.markdown("""
         <div style="background:#0d1f2e; border:1px solid #00B4D8; border-radius:8px;
-        padding:20px 24px; margin-bottom:24px;">
-            <p style="color:#e0e0e0; font-size:15px; margin:0 0 12px 0; line-height:1.8;">
+        padding:22px 26px; margin-bottom:24px;">
+            <p style="color:#e0e0e0; font-size:16px; margin:0 0 14px 0; line-height:1.8;">
             This analysis examines 32,572 consumer loans to answer three questions:</p>
-            <p style="color:#ffffff; font-size:15px; margin:0 0 6px 0; line-height:1.8;">
+            <p style="color:#ffffff; font-size:16px; margin:0 0 8px 0; line-height:1.8;">
             &nbsp;&nbsp;1. &nbsp; <b>Which borrowers are most likely to default?</b></p>
-            <p style="color:#ffffff; font-size:15px; margin:0 0 6px 0; line-height:1.8;">
+            <p style="color:#ffffff; font-size:16px; margin:0 0 8px 0; line-height:1.8;">
             &nbsp;&nbsp;2. &nbsp; <b>Is the lender pricing its risk correctly?</b></p>
-            <p style="color:#ffffff; font-size:15px; margin:0 0 16px 0; line-height:1.8;">
+            <p style="color:#ffffff; font-size:16px; margin:0 0 18px 0; line-height:1.8;">
             &nbsp;&nbsp;3. &nbsp; <b>How should capital be reallocated to maximise risk-adjusted returns?</b></p>
-            <p style="color:#e0e0e0; font-size:15px; margin:0; line-height:1.8;">
+            <p style="color:#e0e0e0; font-size:16px; margin:0; line-height:1.8;">
             A custom risk score was built using borrower characteristics and default history.
             Borrowers were segmented into PRIME, NEAR-PRIME, SUBPRIME, and HIGH-RISK tiers.
             Each tier was then analysed for default behavior, yield, and capital efficiency —
@@ -318,7 +368,7 @@ if page == "📊 Executive Overview":
         "Core strategic opportunity: grow the PRIME book, exit the tail.")
 
     st.subheader("How the Risk Score Was Built")
-    st.caption(
+    sub_caption(
         "Each factor was plotted against default rate across all 32,572 borrowers. "
         "LTI showed three distinct zones — flat below 15%, climbing between 15–40%, spiking sharply above 40%. "
         "Employment length showed a steady improvement with tenure. "
@@ -330,51 +380,51 @@ if page == "📊 Executive Overview":
 
     scoring_html = """
     <div style="overflow-x:auto; margin-bottom:16px;">
-    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+    <table style="width:100%; border-collapse:collapse; font-size:15px;">
     <thead>
-    <tr style="background:#1a1f2e; color:#aaaaaa; font-size:13px;">
-        <th style="padding:12px 16px; text-align:left; border-bottom:1px solid #2d3447; white-space:nowrap;">Risk Factor</th>
-        <th style="padding:12px 16px; text-align:center; border-bottom:1px solid #2d3447; white-space:nowrap;">Default Rate Spread</th>
-        <th style="padding:12px 16px; text-align:center; border-bottom:1px solid #2d3447; white-space:nowrap;">Max Penalty</th>
-        <th style="padding:12px 16px; text-align:center; border-bottom:1px solid #2d3447; white-space:nowrap;">Model Weight</th>
-        <th style="padding:12px 16px; text-align:left; border-bottom:1px solid #2d3447; white-space:nowrap;">Signal Strength</th>
+    <tr style="background:#1a1f2e; color:#aaaaaa; font-size:14px;">
+        <th style="padding:13px 16px; text-align:left; border-bottom:1px solid #2d3447; white-space:nowrap;">Risk Factor</th>
+        <th style="padding:13px 16px; text-align:center; border-bottom:1px solid #2d3447; white-space:nowrap;">Default Rate Spread</th>
+        <th style="padding:13px 16px; text-align:center; border-bottom:1px solid #2d3447; white-space:nowrap;">Max Penalty</th>
+        <th style="padding:13px 16px; text-align:center; border-bottom:1px solid #2d3447; white-space:nowrap;">Model Weight</th>
+        <th style="padding:13px 16px; text-align:left; border-bottom:1px solid #2d3447; white-space:nowrap;">Signal Strength</th>
     </tr>
     </thead>
     <tbody>
     <tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">
-        <td style="padding:12px 16px; color:#cccccc; white-space:nowrap;">📊 Loan-to-Income Ratio</td>
-        <td style="padding:12px 16px; text-align:center; color:#00B4D8; font-weight:700; white-space:nowrap;">62 pts</td>
-        <td style="padding:12px 16px; text-align:center; color:#cccccc; white-space:nowrap;">−66</td>
-        <td style="padding:12px 16px; text-align:center; color:#00B4D8; font-weight:700; white-space:nowrap;">66%</td>
-        <td style="padding:12px 16px; color:#cccccc;">Strongest predictor</td>
+        <td style="padding:13px 16px; color:#cccccc; white-space:nowrap;">📊 Loan-to-Income Ratio</td>
+        <td style="padding:13px 16px; text-align:center; color:#00B4D8; font-weight:700; white-space:nowrap;">62 pts</td>
+        <td style="padding:13px 16px; text-align:center; color:#cccccc; white-space:nowrap;">−66</td>
+        <td style="padding:13px 16px; text-align:center; color:#00B4D8; font-weight:700; white-space:nowrap;">66%</td>
+        <td style="padding:13px 16px; color:#cccccc;">Strongest predictor</td>
     </tr>
     <tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">
-        <td style="padding:12px 16px; color:#cccccc; white-space:nowrap;">📋 Prior Default on File</td>
-        <td style="padding:12px 16px; text-align:center; color:#FFB703; font-weight:700; white-space:nowrap;">19 pts</td>
-        <td style="padding:12px 16px; text-align:center; color:#cccccc; white-space:nowrap;">−20</td>
-        <td style="padding:12px 16px; text-align:center; color:#FFB703; font-weight:700; white-space:nowrap;">20%</td>
-        <td style="padding:12px 16px; color:#cccccc;">Strong signal</td>
+        <td style="padding:13px 16px; color:#cccccc; white-space:nowrap;">📋 Prior Default on File</td>
+        <td style="padding:13px 16px; text-align:center; color:#FFB703; font-weight:700; white-space:nowrap;">19 pts</td>
+        <td style="padding:13px 16px; text-align:center; color:#cccccc; white-space:nowrap;">−20</td>
+        <td style="padding:13px 16px; text-align:center; color:#FFB703; font-weight:700; white-space:nowrap;">20%</td>
+        <td style="padding:13px 16px; color:#cccccc;">Strong signal</td>
     </tr>
     <tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">
-        <td style="padding:12px 16px; color:#cccccc; white-space:nowrap;">💼 Employment Length</td>
-        <td style="padding:12px 16px; text-align:center; color:#FB8500; font-weight:700; white-space:nowrap;">11 pts</td>
-        <td style="padding:12px 16px; text-align:center; color:#cccccc; white-space:nowrap;">−12</td>
-        <td style="padding:12px 16px; text-align:center; color:#FB8500; font-weight:700; white-space:nowrap;">12%</td>
-        <td style="padding:12px 16px; color:#cccccc;">Moderate signal</td>
+        <td style="padding:13px 16px; color:#cccccc; white-space:nowrap;">💼 Employment Length</td>
+        <td style="padding:13px 16px; text-align:center; color:#FB8500; font-weight:700; white-space:nowrap;">11 pts</td>
+        <td style="padding:13px 16px; text-align:center; color:#cccccc; white-space:nowrap;">−12</td>
+        <td style="padding:13px 16px; text-align:center; color:#FB8500; font-weight:700; white-space:nowrap;">12%</td>
+        <td style="padding:13px 16px; color:#cccccc;">Moderate signal</td>
     </tr>
     <tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">
-        <td style="padding:12px 16px; color:#cccccc; white-space:nowrap;">🕐 Credit History Length</td>
-        <td style="padding:12px 16px; text-align:center; color:#888888; font-weight:700; white-space:nowrap;">2 pts</td>
-        <td style="padding:12px 16px; text-align:center; color:#cccccc; white-space:nowrap;">−2</td>
-        <td style="padding:12px 16px; text-align:center; color:#888888; font-weight:700; white-space:nowrap;">2%</td>
-        <td style="padding:12px 16px; color:#cccccc;">Weak signal</td>
+        <td style="padding:13px 16px; color:#cccccc; white-space:nowrap;">🕐 Credit History Length</td>
+        <td style="padding:13px 16px; text-align:center; color:#888888; font-weight:700; white-space:nowrap;">2 pts</td>
+        <td style="padding:13px 16px; text-align:center; color:#cccccc; white-space:nowrap;">−2</td>
+        <td style="padding:13px 16px; text-align:center; color:#888888; font-weight:700; white-space:nowrap;">2%</td>
+        <td style="padding:13px 16px; color:#cccccc;">Weak signal</td>
     </tr>
     <tr style="background:#1a1f2e;">
-        <td style="padding:12px 16px; color:#ffffff; font-weight:700; white-space:nowrap;">Total</td>
-        <td style="padding:12px 16px; text-align:center; color:#ffffff; font-weight:700; white-space:nowrap;">94 pts</td>
-        <td style="padding:12px 16px; text-align:center; color:#aaaaaa; white-space:nowrap;"></td>
-        <td style="padding:12px 16px; text-align:center; color:#ffffff; font-weight:700; white-space:nowrap;">100%</td>
-        <td style="padding:12px 16px; color:#aaaaaa;">Score range: 0 – 100</td>
+        <td style="padding:13px 16px; color:#ffffff; font-weight:700; white-space:nowrap;">Total</td>
+        <td style="padding:13px 16px; text-align:center; color:#ffffff; font-weight:700; white-space:nowrap;">94 pts</td>
+        <td style="padding:13px 16px; text-align:center; color:#aaaaaa; white-space:nowrap;"></td>
+        <td style="padding:13px 16px; text-align:center; color:#ffffff; font-weight:700; white-space:nowrap;">100%</td>
+        <td style="padding:13px 16px; color:#aaaaaa;">Score range: 0 – 100</td>
     </tr>
     </tbody>
     </table>
@@ -384,41 +434,41 @@ if page == "📊 Executive Overview":
 
     st.markdown("---")
     st.subheader("Risk Segments")
-    st.caption(
+    sub_caption(
         "Every borrower receives a final risk score from 0 to 100. Higher score means lower risk. "
         "The score distribution below shows how the borrower population clusters — "
         "segment boundaries sit at the natural dips between those clusters.")
 
     seg_def_html = """
     <div style="overflow-x:auto; margin-bottom:16px;">
-    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+    <table style="width:100%; border-collapse:collapse; font-size:15px;">
     <thead>
-    <tr style="background:#1a1f2e; color:#aaaaaa; font-size:13px;">
-        <th style="padding:12px 16px; text-align:left; border-bottom:1px solid #2d3447; white-space:nowrap;">Segment</th>
-        <th style="padding:12px 16px; text-align:center; border-bottom:1px solid #2d3447; white-space:nowrap;">Risk Score</th>
-        <th style="padding:12px 16px; text-align:left; border-bottom:1px solid #2d3447;">What It Means</th>
+    <tr style="background:#1a1f2e; color:#aaaaaa; font-size:14px;">
+        <th style="padding:13px 16px; text-align:left; border-bottom:1px solid #2d3447; white-space:nowrap;">Segment</th>
+        <th style="padding:13px 16px; text-align:center; border-bottom:1px solid #2d3447; white-space:nowrap;">Risk Score</th>
+        <th style="padding:13px 16px; text-align:left; border-bottom:1px solid #2d3447;">What It Means</th>
     </tr>
     </thead>
     <tbody>
     <tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">
-        <td style="padding:12px 16px; color:#00B4D8; font-weight:700; white-space:nowrap;">PRIME</td>
-        <td style="padding:12px 16px; text-align:center; color:#cccccc; white-space:nowrap;">80 – 100</td>
-        <td style="padding:12px 16px; color:#cccccc;">Low risk. Strong income coverage, stable employment, clean credit history.</td>
+        <td style="padding:13px 16px; color:#00B4D8; font-weight:700; white-space:nowrap;">PRIME</td>
+        <td style="padding:13px 16px; text-align:center; color:#cccccc; white-space:nowrap;">80 – 100</td>
+        <td style="padding:13px 16px; color:#cccccc;">Low risk. Strong income coverage, stable employment, clean credit history.</td>
     </tr>
     <tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">
-        <td style="padding:12px 16px; color:#FFB703; font-weight:700; white-space:nowrap;">NEAR-PRIME</td>
-        <td style="padding:12px 16px; text-align:center; color:#cccccc; white-space:nowrap;">60 – 79</td>
-        <td style="padding:12px 16px; color:#cccccc;">Moderate risk. One weak factor present — manageable with standard underwriting.</td>
+        <td style="padding:13px 16px; color:#FFB703; font-weight:700; white-space:nowrap;">NEAR-PRIME</td>
+        <td style="padding:13px 16px; text-align:center; color:#cccccc; white-space:nowrap;">60 – 79</td>
+        <td style="padding:13px 16px; color:#cccccc;">Moderate risk. One weak factor present — manageable with standard underwriting.</td>
     </tr>
     <tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">
-        <td style="padding:12px 16px; color:#FB8500; font-weight:700; white-space:nowrap;">SUBPRIME</td>
-        <td style="padding:12px 16px; text-align:center; color:#cccccc; white-space:nowrap;">40 – 59</td>
-        <td style="padding:12px 16px; color:#cccccc;">Elevated risk. Multiple risk factors stacking. Selective exposure only.</td>
+        <td style="padding:13px 16px; color:#FB8500; font-weight:700; white-space:nowrap;">SUBPRIME</td>
+        <td style="padding:13px 16px; text-align:center; color:#cccccc; white-space:nowrap;">40 – 59</td>
+        <td style="padding:13px 16px; color:#cccccc;">Elevated risk. Multiple risk factors stacking. Selective exposure only.</td>
     </tr>
     <tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">
-        <td style="padding:12px 16px; color:#E63946; font-weight:700; white-space:nowrap;">HIGH-RISK</td>
-        <td style="padding:12px 16px; text-align:center; color:#cccccc; white-space:nowrap;">Below 40</td>
-        <td style="padding:12px 16px; color:#cccccc;">Severe risk. Overleveraged, unstable income, prior defaults. Exit recommended.</td>
+        <td style="padding:13px 16px; color:#E63946; font-weight:700; white-space:nowrap;">HIGH-RISK</td>
+        <td style="padding:13px 16px; text-align:center; color:#cccccc; white-space:nowrap;">Below 40</td>
+        <td style="padding:13px 16px; color:#cccccc;">Severe risk. Overleveraged, unstable income, prior defaults. Exit recommended.</td>
     </tr>
     </tbody>
     </table>
@@ -512,7 +562,6 @@ if page == "📊 Executive Overview":
     st.markdown("---")
     st.subheader("Segment Summary — The Foundation of This Analysis")
     render_anchor_table()
-
     st.markdown("<div style='margin-bottom:24px;'></div>", unsafe_allow_html=True)
 
 
@@ -522,7 +571,7 @@ elif page == "📈 Portfolio Analysis":
     components.html(SCROLL_TOP, height=0)
 
     st.title("📈 Portfolio Analysis")
-    st.caption("Lender Grade Validation, Exposure & Risk-Adjusted Return")
+    sub_caption("Lender Grade Validation, Exposure & Risk-Adjusted Return")
     st.markdown("---")
 
     insight_box(
@@ -531,48 +580,48 @@ elif page == "📈 Portfolio Analysis":
         "The lender is taking more risk without adequate compensation.")
 
     st.subheader("Does the Lender's Grade Tell the Full Story?")
-    st.caption(
+    sub_caption(
         "The original dataset contains lender-assigned grades A–G (A = best quality, G = lowest). "
         "This project builds an independent risk segmentation and compares it against the lender's grading system. "
         "Where the two disagree — the heatmap below shows it.")
 
     grade_def_html = """
     <div style="overflow-x:auto; margin-bottom:16px;">
-    <table style="width:100%; border-collapse:collapse; font-size:14px;">
+    <table style="width:100%; border-collapse:collapse; font-size:15px;">
     <thead>
-    <tr style="background:#1a1f2e; color:#aaaaaa; font-size:13px;">
-        <th style="padding:10px 16px; text-align:center; border-bottom:1px solid #2d3447; white-space:nowrap;">Grade</th>
-        <th style="padding:10px 16px; text-align:left; border-bottom:1px solid #2d3447;">Lender's Assessment</th>
+    <tr style="background:#1a1f2e; color:#aaaaaa; font-size:14px;">
+        <th style="padding:11px 16px; text-align:center; border-bottom:1px solid #2d3447; white-space:nowrap;">Grade</th>
+        <th style="padding:11px 16px; text-align:left; border-bottom:1px solid #2d3447;">Lender's Assessment</th>
     </tr>
     </thead>
     <tbody>
     <tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">
-        <td style="padding:10px 16px; text-align:center; color:#00B4D8; font-weight:700;">A</td>
-        <td style="padding:10px 16px; color:#cccccc;">Best credit quality</td>
+        <td style="padding:11px 16px; text-align:center; color:#00B4D8; font-weight:700;">A</td>
+        <td style="padding:11px 16px; color:#cccccc;">Best credit quality</td>
     </tr>
     <tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">
-        <td style="padding:10px 16px; text-align:center; color:#48CAE4; font-weight:700;">B</td>
-        <td style="padding:10px 16px; color:#cccccc;">Low risk</td>
+        <td style="padding:11px 16px; text-align:center; color:#48CAE4; font-weight:700;">B</td>
+        <td style="padding:11px 16px; color:#cccccc;">Low risk</td>
     </tr>
     <tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">
-        <td style="padding:10px 16px; text-align:center; color:#FFB703; font-weight:700;">C</td>
-        <td style="padding:10px 16px; color:#cccccc;">Moderate risk</td>
+        <td style="padding:11px 16px; text-align:center; color:#FFB703; font-weight:700;">C</td>
+        <td style="padding:11px 16px; color:#cccccc;">Moderate risk</td>
     </tr>
     <tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">
-        <td style="padding:10px 16px; text-align:center; color:#FFB703; font-weight:700;">D</td>
-        <td style="padding:10px 16px; color:#cccccc;">Elevated risk</td>
+        <td style="padding:11px 16px; text-align:center; color:#FFB703; font-weight:700;">D</td>
+        <td style="padding:11px 16px; color:#cccccc;">Elevated risk</td>
     </tr>
     <tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">
-        <td style="padding:10px 16px; text-align:center; color:#FB8500; font-weight:700;">E</td>
-        <td style="padding:10px 16px; color:#cccccc;">High risk</td>
+        <td style="padding:11px 16px; text-align:center; color:#FB8500; font-weight:700;">E</td>
+        <td style="padding:11px 16px; color:#cccccc;">High risk</td>
     </tr>
     <tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">
-        <td style="padding:10px 16px; text-align:center; color:#E63946; font-weight:700;">F</td>
-        <td style="padding:10px 16px; color:#cccccc;">Very high risk</td>
+        <td style="padding:11px 16px; text-align:center; color:#E63946; font-weight:700;">F</td>
+        <td style="padding:11px 16px; color:#cccccc;">Very high risk</td>
     </tr>
     <tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">
-        <td style="padding:10px 16px; text-align:center; color:#E63946; font-weight:700;">G</td>
-        <td style="padding:10px 16px; color:#cccccc;">Lowest quality</td>
+        <td style="padding:11px 16px; text-align:center; color:#E63946; font-weight:700;">G</td>
+        <td style="padding:11px 16px; color:#cccccc;">Lowest quality</td>
     </tr>
     </tbody>
     </table>
@@ -604,7 +653,7 @@ elif page == "📈 Portfolio Analysis":
     fig_heat.update_layout(
         paper_bgcolor=BG, plot_bgcolor=BG, font_color="white",
         margin=dict(t=20, b=10, l=10, r=10))
-    fig_heat.update_traces(xgap=2, ygap=2)
+    fig_heat.update_traces(xgap=2, ygap=2, textfont={"color": "white", "size": 14})
     st.plotly_chart(fig_heat, use_container_width=True, config=CHART_CONFIG)
 
     st.markdown("---")
@@ -710,7 +759,7 @@ elif page == "🎯 Capital Allocation Strategy":
     components.html(SCROLL_TOP, height=0)
 
     st.title("🎯 Capital Allocation Strategy")
-    st.caption("Where should capital be deployed? Exposure vs loss contribution and recommended reallocation.")
+    sub_caption("Where should capital be deployed? Exposure vs loss contribution and recommended reallocation.")
     st.markdown("---")
 
     insight_box(
@@ -719,7 +768,7 @@ elif page == "🎯 Capital Allocation Strategy":
         "Reallocation from those segments into PRIME reduces portfolio default rate "
         "without shrinking total book size.")
 
-    st.caption("📌 All base figures below come from the Executive Overview.")
+    sub_caption("📌 All base figures below come from the Executive Overview.")
 
     rows = anchor_rows.copy()
     for r in rows:
@@ -791,7 +840,7 @@ elif page == "📉 Stress Testing & Scenarios":
     components.html(SCROLL_TOP, height=0)
 
     st.title("📉 Stress Testing & Scenarios")
-    st.caption("What happens to the portfolio under adverse conditions?")
+    sub_caption("What happens to the portfolio under adverse conditions?")
     st.markdown("---")
 
     insight_box(
@@ -800,7 +849,7 @@ elif page == "📉 Stress Testing & Scenarios":
         "PRIME is the most resilient — its low base default rate means even a severe shock "
         "causes less absolute damage than the same shock applied to HIGH-RISK.")
 
-    st.caption(
+    sub_caption(
         "📌 All base figures below come from the Executive Overview. "
         "EL = Exposure × Default Rate × LGD.")
 
@@ -849,19 +898,19 @@ elif page == "📉 Stress Testing & Scenarios":
 
     st.markdown("")
     st.markdown(
-        "<p style='color:#aaaaaa; font-size:13px; margin-bottom:8px;'>"
+        "<p style='color:#aaaaaa; font-size:14px; margin-bottom:8px;'>"
         "Full computation chain — Exposure × Default Rate × LGD = Expected Loss.</p>",
         unsafe_allow_html=True)
 
     el_hdr = (
         '<div style="overflow-x:auto; margin-bottom:20px;">'
-        '<table style="width:100%; border-collapse:collapse; font-size:14px;">'
-        '<thead><tr style="background:#1a1f2e; color:#aaaaaa; font-size:13px;">'
-        '<th style="padding:12px 16px; text-align:left; white-space:nowrap; border-bottom:1px solid #2d3447;">Segment</th>'
-        '<th style="padding:12px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">Exposure ($ Mn)</th>'
-        '<th style="padding:12px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">Base Default Rate</th>'
-        '<th style="padding:12px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">LGD</th>'
-        '<th style="padding:12px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">Base Expected Loss ($ Mn)</th>'
+        '<table style="width:100%; border-collapse:collapse; font-size:15px;">'
+        '<thead><tr style="background:#1a1f2e; color:#aaaaaa; font-size:14px;">'
+        '<th style="padding:13px 16px; text-align:left; white-space:nowrap; border-bottom:1px solid #2d3447;">Segment</th>'
+        '<th style="padding:13px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">Exposure ($ Mn)</th>'
+        '<th style="padding:13px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">Base Default Rate</th>'
+        '<th style="padding:13px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">LGD</th>'
+        '<th style="padding:13px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">Base Expected Loss ($ Mn)</th>'
         '</tr></thead><tbody>'
     )
     el_body = ""
@@ -869,28 +918,28 @@ elif page == "📉 Stress Testing & Scenarios":
         exp_mn = round(r["exp"] / 1_000_000, 2)
         el_body += (
             f'<tr style="background:#0e1117; border-bottom:1px solid #1a1f2e;">'
-            f'<td style="padding:12px 16px; color:{seg_colors[r["seg"]]}; font-weight:700; white-space:nowrap;">{r["seg"]}</td>'
-            f'<td style="padding:12px 16px; text-align:right; color:#cccccc; white-space:nowrap;">${exp_mn} Mn</td>'
-            f'<td style="padding:12px 16px; text-align:right; color:#cccccc; white-space:nowrap;">{r["base_dr"]}%</td>'
-            f'<td style="padding:12px 16px; text-align:right; color:#cccccc; white-space:nowrap;">{int(LGD*100)}%</td>'
-            f'<td style="padding:12px 16px; text-align:right; color:#00B4D8; font-weight:700; white-space:nowrap;">${r["base_el"]} Mn</td>'
+            f'<td style="padding:13px 16px; color:{seg_colors[r["seg"]]}; font-weight:700; white-space:nowrap;">{r["seg"]}</td>'
+            f'<td style="padding:13px 16px; text-align:right; color:#cccccc; white-space:nowrap;">${exp_mn} Mn</td>'
+            f'<td style="padding:13px 16px; text-align:right; color:#cccccc; white-space:nowrap;">{r["base_dr"]}%</td>'
+            f'<td style="padding:13px 16px; text-align:right; color:#cccccc; white-space:nowrap;">{int(LGD*100)}%</td>'
+            f'<td style="padding:13px 16px; text-align:right; color:#00B4D8; font-weight:700; white-space:nowrap;">${r["base_el"]} Mn</td>'
             f'</tr>'
         )
     total_exp_mn = round(sum(r["exp"] for r in stress_rows) / 1_000_000, 2)
     el_body += (
         f'<tr style="background:#1a1f2e;">'
-        f'<td style="padding:12px 16px; color:#ffffff; font-weight:700;">Total</td>'
-        f'<td style="padding:12px 16px; text-align:right; color:#ffffff; font-weight:700;">${total_exp_mn} Mn</td>'
-        f'<td style="padding:12px 16px; text-align:right; color:#aaaaaa;">—</td>'
-        f'<td style="padding:12px 16px; text-align:right; color:#aaaaaa;">{int(LGD*100)}%</td>'
-        f'<td style="padding:12px 16px; text-align:right; color:#ffffff; font-weight:700;">${base_total_el} Mn</td>'
+        f'<td style="padding:13px 16px; color:#ffffff; font-weight:700;">Total</td>'
+        f'<td style="padding:13px 16px; text-align:right; color:#ffffff; font-weight:700;">${total_exp_mn} Mn</td>'
+        f'<td style="padding:13px 16px; text-align:right; color:#aaaaaa;">—</td>'
+        f'<td style="padding:13px 16px; text-align:right; color:#aaaaaa;">{int(LGD*100)}%</td>'
+        f'<td style="padding:13px 16px; text-align:right; color:#ffffff; font-weight:700;">${base_total_el} Mn</td>'
         f'</tr>'
     )
     st.markdown(el_hdr + el_body + "</tbody></table></div>", unsafe_allow_html=True)
 
     s_header = (
         '<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:15px;">'
-        '<thead><tr style="background:#1a1f2e; color:#aaaaaa; font-size:13px;">'
+        '<thead><tr style="background:#1a1f2e; color:#aaaaaa; font-size:14px;">'
         '<th style="padding:14px 16px; text-align:left; white-space:nowrap; border-bottom:1px solid #2d3447;">Segment</th>'
         '<th style="padding:14px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">Base Default Rate</th>'
         '<th style="padding:14px 16px; text-align:right; white-space:nowrap; border-bottom:1px solid #2d3447;">Stressed Default Rate</th>'
@@ -961,7 +1010,7 @@ elif page == "📉 Stress Testing & Scenarios":
 
     st.markdown("---")
     st.subheader("Section 2 — Capital Reallocation Simulator")
-    st.caption(
+    sub_caption(
         "Simulates future lending decisions — not movement of existing loans. "
         "Redirects future originations from SUBPRIME and HIGH-RISK towards PRIME "
         "while keeping total portfolio size constant. "
@@ -1034,7 +1083,7 @@ elif page == "📉 Stress Testing & Scenarios":
 
     st.markdown("")
     st.markdown(
-        f"<p style='color:#aaaaaa; font-size:13px; margin-top:4px; margin-bottom:16px;'>"
+        f"<p style='color:#aaaaaa; font-size:14px; margin-top:4px; margin-bottom:16px;'>"
         f"Reallocation sourced proportionally — "
         f"<b style='color:#FB8500'>{round(sub_weight*100,1)}% from SUBPRIME</b> and "
         f"<b style='color:#E63946'>{round(high_weight*100,1)}% from HIGH-RISK</b>, "
@@ -1078,7 +1127,7 @@ elif page == "📋 Management Recommendations":
     components.html(SCROLL_TOP, height=0)
 
     st.title("📋 Management Recommendations")
-    st.caption("Executive summary — findings, actions and strategic direction.")
+    sub_caption("Executive summary — findings, actions and strategic direction.")
     st.markdown("---")
 
     insight_box(
@@ -1154,13 +1203,13 @@ elif page == "📋 Management Recommendations":
 
     finding_html = '<div style="background:#1a1f2e; border-radius:10px; padding:24px 28px; border:1px solid #2d3447;">'
     for f in findings:
-        finding_html += f'<p style="color:#cccccc; font-size:15px; margin-bottom:14px; line-height:1.6;">&#8594; {f}</p>'
+        finding_html += f'<p style="color:#cccccc; font-size:16px; margin-bottom:14px; line-height:1.7;">&#8594; {f}</p>'
     finding_html += '</div>'
     st.markdown(finding_html, unsafe_allow_html=True)
 
     st.markdown("---")
     st.subheader("Recommended Actions")
-    st.caption(
+    sub_caption(
         "Logic: loss contribution > 2× exposure share → Exit | "
         "loss > exposure share → Tighten | "
         "loss < 80% of exposure share → Grow | otherwise → Maintain")
@@ -1182,7 +1231,7 @@ elif page == "📋 Management Recommendations":
 
     a_header = (
         '<div style="overflow-x:auto;"><table style="width:100%; border-collapse:collapse; font-size:15px;">'
-        '<thead><tr style="background:#1a1f2e; color:#aaaaaa; font-size:13px;">'
+        '<thead><tr style="background:#1a1f2e; color:#aaaaaa; font-size:14px;">'
         '<th style="padding:14px 16px; text-align:left; white-space:nowrap; border-bottom:1px solid #2d3447;">Segment</th>'
         '<th style="padding:14px 16px; text-align:center; white-space:nowrap; border-bottom:1px solid #2d3447;">Action</th>'
         '<th style="padding:14px 16px; text-align:left; white-space:nowrap; border-bottom:1px solid #2d3447;">What to Do</th>'
@@ -1198,7 +1247,7 @@ elif page == "📋 Management Recommendations":
             '<td style="padding:13px 16px; text-align:center; white-space:nowrap;">'
             '<span style="background-color:' + color + '33; color:' + color + '; border:1px solid ' + color + '; ' + badge_style + '">' + rec + '</span></td>'
             '<td style="padding:13px 16px; color:#cccccc; white-space:nowrap;">' + what + '</td>'
-            '<td style="padding:13px 16px; color:#888888; font-size:13px;">' + why + '</td>'
+            '<td style="padding:13px 16px; color:#888888; font-size:14px;">' + why + '</td>'
             '</tr>'
         )
     st.markdown(a_header + a_body + "</tbody></table></div>", unsafe_allow_html=True)
