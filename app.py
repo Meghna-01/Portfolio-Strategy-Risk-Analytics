@@ -37,7 +37,7 @@ st.markdown("""
     /* ── Sidebar inner width portrait phone ── */
     @media (max-width: 768px) {
         section[data-testid="stSidebar"] > div:first-child {
-            width: 280px !important;
+            width: 285px !important;
         }
         [data-testid="stSidebarContent"] h1 {
             font-size: 14px !important;
