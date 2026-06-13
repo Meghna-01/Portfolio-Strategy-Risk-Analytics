@@ -13,7 +13,7 @@ st.set_page_config(
 
 st.markdown("""
     <style>
-    /* ── Metric cards ── */
+    /* ── Metric values ── */
     [data-testid="stMetricValue"] {
         font-size: 28px;
         font-weight: bold;
@@ -27,28 +27,38 @@ st.markdown("""
     /* ── Sidebar background ── */
     section[data-testid="stSidebar"] {
         background-color: #0d1117;
+        min-width: 310px !important;
+        max-width: 310px !important;
+        width: 310px !important;
     }
 
-    /* ── Sidebar: remove top padding so title sits at top ── */
-    section[data-testid="stSidebar"] > div:first-child {
-        padding-top: 1.2rem !important;
+    /* ── Kill the top empty space in sidebar ── */
+    [data-testid="stSidebarContent"] {
+        padding-top: 0.6rem !important;
     }
 
-    /* ── Sidebar title size ── */
-    section[data-testid="stSidebar"] h1 {
-        font-size: 17px !important;
+    /* ── Sidebar title ── */
+    [data-testid="stSidebarContent"] h1 {
+        font-size: 16px !important;
+        font-weight: 700 !important;
         line-height: 1.4 !important;
+        color: #ffffff !important;
+        margin-top: 0 !important;
         margin-bottom: 0.5rem !important;
+        padding-top: 0 !important;
+        white-space: normal !important;
     }
 
-    /* ── Sidebar radio tab font ── */
+    /* ── Sidebar radio tab font — bigger, no wrap ── */
     [data-testid="stSidebar"] [data-testid="stRadio"] label p {
-        font-size: 15px !important;
+        font-size: 14.5px !important;
         font-weight: 500 !important;
         white-space: nowrap !important;
+        overflow: hidden !important;
+        text-overflow: ellipsis !important;
     }
 
-    /* ── Selectbox styling ── */
+    /* ── Selectbox ── */
     [data-testid="stSelectbox"] > div > div {
         border: 1px solid #00B4D8 !important;
         border-radius: 6px !important;
@@ -95,14 +105,14 @@ st.markdown("""
         text-overflow: ellipsis;
     }
 
-    /* ── Mobile: stack cards ── */
+    /* ── Mobile: 2-per-row cards ── */
     @media (max-width: 640px) {
         .metric-card {
             flex: 1 1 calc(50% - 12px);
             padding: 12px 14px;
         }
         .metric-card p.value {
-            font-size: 16px;
+            font-size: 15px;
         }
         .block-container {
             padding-left: 0.8rem !important;
@@ -110,13 +120,10 @@ st.markdown("""
         }
     }
 
-    /* ── Remove excess whitespace after plotly charts ── */
+    /* ── Remove excess whitespace after charts ── */
     .stPlotlyChart {
         margin-bottom: 0 !important;
         padding-bottom: 0 !important;
-    }
-    iframe[title="streamlit_plotly_events.streamlit_plotly_events"] {
-        margin-bottom: 0 !important;
     }
     </style>
 """, unsafe_allow_html=True)
@@ -128,14 +135,13 @@ CHART_CONFIG = {"staticPlot": True}
 
 df = pd.read_csv("clean_lending_data.csv")
 
-# ── Shorter tab names — fit on one line, font can be bigger ──
-st.sidebar.title("Portfolio Strategy\n& Risk Analytics")
+st.sidebar.title("Portfolio Strategy & Risk Analytics")
 page = st.sidebar.radio("", [
-    "📊 Overview",
-    "📈 Portfolio",
-    "🎯 Allocation",
-    "📉 Stress Testing",
-    "📋 Recommendations"
+    "📊 Executive Overview",
+    "📈 Portfolio Analysis",
+    "🎯 Capital Allocation Strategy",
+    "📉 Stress Testing & Scenarios",
+    "📋 Management Recommendations"
 ])
 st.sidebar.markdown("---")
 LGD = st.sidebar.slider("LGD Assumption (%)", min_value=20, max_value=100, value=60, step=5) / 100
@@ -261,7 +267,7 @@ def render_anchor_table(note=""):
 
 
 # ============ PAGE 1 ============
-if page == "📊 Overview":
+if page == "📊 Executive Overview":
 
     components.html(SCROLL_TOP, height=0)
 
@@ -511,7 +517,7 @@ if page == "📊 Overview":
 
 
 # ============ PAGE 2 ============
-elif page == "📈 Portfolio":
+elif page == "📈 Portfolio Analysis":
 
     components.html(SCROLL_TOP, height=0)
 
@@ -699,7 +705,7 @@ elif page == "📈 Portfolio":
 
 
 # ============ PAGE 3 ============
-elif page == "🎯 Allocation":
+elif page == "🎯 Capital Allocation Strategy":
 
     components.html(SCROLL_TOP, height=0)
 
@@ -780,7 +786,7 @@ elif page == "🎯 Allocation":
 
 
 # ============ PAGE 4 ============
-elif page == "📉 Stress Testing":
+elif page == "📉 Stress Testing & Scenarios":
 
     components.html(SCROLL_TOP, height=0)
 
@@ -1067,7 +1073,7 @@ elif page == "📉 Stress Testing":
 
 
 # ============ PAGE 5 ============
-elif page == "📋 Recommendations":
+elif page == "📋 Management Recommendations":
 
     components.html(SCROLL_TOP, height=0)
 
